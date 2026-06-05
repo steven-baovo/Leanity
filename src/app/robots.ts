@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
   // Thay thế bằng tên miền chính thức của bạn khi deploy (ví dụ: https://leanity.vn)
-  const baseUrl = 'https://www.leanitylabs.com'
+  const baseUrl = 'https://leanitylabs.com'
 
   return {
     rules: {

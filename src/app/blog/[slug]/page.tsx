@@ -133,7 +133,7 @@ export async function generateMetadata({ params }: PageProps) {
     }
   }
 
-  const url = `https://www.leanitylabs.com/blog/${slug}`
+  const url = `https://leanitylabs.com/blog/${slug}`
 
   return {
     title: `${post.title} | Leanity Blog`,
@@ -232,12 +232,12 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
       "name": "Leanity",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.leanitylabs.com/logo.png"
+        "url": "https://leanitylabs.com/logo.png"
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://www.leanitylabs.com/blog/${post.slug}`
+      "@id": `https://leanitylabs.com/blog/${post.slug}`
     }
   }
 

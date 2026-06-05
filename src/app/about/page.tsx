@@ -23,7 +23,7 @@ export default function AboutPage() {
       "name": "Leanity Labs",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.leanitylabs.com/logo.png"
+        "url": "https://leanitylabs.com/logo.png"
       }
     }
   }
