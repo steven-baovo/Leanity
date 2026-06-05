@@ -61,13 +61,13 @@ export default async function BlogPage() {
     "@type": "Blog",
     "name": "Leanity Blog",
     "description": "Nơi chia sẻ các bài viết khoa học về sự tập trung sâu, cách kích hoạt trạng thái dòng chảy (Flow State) và triết lý sản phẩm không ma sát (Zero Friction) cùng Leanity.",
-    "url": "https://www.leanity.io.vn/blog",
+    "url": "https://www.leanitylabs.com/blog",
     "publisher": {
       "@type": "Organization",
       "name": "Leanity",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.leanity.io.vn/logo.png"
+        "url": "https://www.leanitylabs.com/logo.png"
       }
     },
     "blogPost": blogPosts.map(post => ({
@@ -79,7 +79,7 @@ export default async function BlogPage() {
         "@type": "Person",
         "name": post.author?.name || 'Ban Biên Tập Leanity'
       },
-      "url": `https://www.leanity.io.vn/blog/${post.slug}`
+      "url": `https://www.leanitylabs.com/blog/${post.slug}`
     }))
   }
 

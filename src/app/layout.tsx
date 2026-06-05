@@ -30,14 +30,14 @@ export const metadata: Metadata = {
     "hiệu suất làm việc"
   ],
   manifest: "/manifest.json",
-  metadataBase: new URL("https://www.leanity.io.vn"), // Thay thế bằng domain chính thức của bạn khi có
+  metadataBase: new URL("https://www.leanitylabs.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "Leanity - Giải Pháp Quản Lý Hiệu Suất Toàn Diện",
     description: "Hệ sinh thái hỗ trợ quản lý năng suất công việc: Quản lý Tasks, soạn thảo tài liệu lâu dài, đồng hồ Pomodoro tập trung và báo cáo công việc hàng ngày.",
-    url: "https://www.leanity.io.vn",
+    url: "https://www.leanitylabs.com",
     siteName: "Leanity",
     images: [
       {

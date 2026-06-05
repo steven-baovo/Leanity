@@ -30,7 +30,7 @@ export default function ContactPage() {
     "@type": "ContactPage",
     "name": "Liên hệ Leanity",
     "description": "Trang liên hệ chính thức của Leanity Labs. Gửi phản hồi, yêu cầu hỗ trợ kỹ thuật hoặc hợp tác phát triển.",
-    "url": "https://www.leanity.io.vn/contact",
+    "url": "https://www.leanitylabs.com/contact",
     "mainEntity": {
       "@type": "Organization",
       "name": "Leanity",

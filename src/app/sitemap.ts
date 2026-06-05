@@ -3,7 +3,7 @@ import { client } from '@/lib/sanity'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Thay thế bằng tên miền chính thức của bạn khi deploy (ví dụ: https://leanity.vn)
-  const baseUrl = 'https://www.leanity.io.vn'
+  const baseUrl = 'https://www.leanitylabs.com'
   const lastModified = new Date()
 
   // Các trang công khai (public routes) được hiển thị ra ngoài để Google lập chỉ mục
