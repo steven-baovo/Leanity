@@ -105,9 +105,29 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
     return () => observer.disconnect()
   }, [])
 
-  // 1. Xử lý dữ liệu đồ thị (Chỉ giữ lại Note, Canvas/Map, và Link)
+  // Điều chỉnh các lực đẩy vật lý D3 để tránh chồng chéo các node và text labels
+  useEffect(() => {
+    if (graphRef.current) {
+      // Tăng lực đẩy (repulsion) giữa các node để dạt ra xa nhau hơn (default là -30)
+      const chargeForce = graphRef.current.d3Force('charge')
+      if (chargeForce) {
+        chargeForce.strength(-180)
+      }
+      
+      // Tăng khoảng cách liên kết tối thiểu (default là 30)
+      const linkForce = graphRef.current.d3Force('link')
+      if (linkForce) {
+        linkForce.distance(80)
+      }
+
+      // Đun nóng lại bộ mô phỏng vật lý để áp dụng thay đổi ngay lập tức
+      graphRef.current.d3ReheatSimulation()
+    }
+  }, [graphData])
+
+  // 1. Xử lý dữ liệu đồ thị (Bao gồm Note, Canvas/Map, Link, và Folder)
   const { graphData } = useMemo(() => {
-    const filteredNodes = nodes.filter(n => n.type === 'note' || n.type === 'map' || n.type === 'link')
+    const filteredNodes = nodes.filter(n => n.type === 'note' || n.type === 'map' || n.type === 'link' || n.type === 'folder')
 
     const gNodes = filteredNodes.map(n => {
       // Tìm xem node này đã tồn tại trong prevNodes chưa để tái sử dụng tọa độ & vận tốc của D3
@@ -131,6 +151,22 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
     const processedPairs = new Set<string>()
     const filteredNodeIds = new Set(gNodes.map(n => n.id))
 
+    // Thêm liên kết thư mục phân cấp (nối các node con với thư mục cha)
+    filteredNodes.forEach(n => {
+      if (n.parent_id && filteredNodeIds.has(n.parent_id)) {
+        const pairKey = [n.id, n.parent_id].sort().join('-')
+        if (!processedPairs.has(pairKey)) {
+          processedPairs.add(pairKey)
+          gLinks.push({
+            source: n.parent_id,
+            target: n.id,
+            type: 'hierarchy'
+          })
+        }
+      }
+    })
+
+    // Thêm các kết nối thủ công (custom links) giữa các node
     filteredNodes.forEach(n => {
       if (n.connected_node_ids && Array.isArray(n.connected_node_ids)) {
         n.connected_node_ids.forEach(targetId => {
@@ -192,8 +228,11 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
             
             if (hoveredNode) {
               const isConnected = node.id === hoveredNode.id || 
-                                  (hoveredNode.connected_node_ids && hoveredNode.connected_node_ids.includes(node.id)) ||
-                                  (node.connected_node_ids && node.connected_node_ids.includes(hoveredNode.id));
+                                  graphData.links.some(link => {
+                                    const sId = typeof link.source === 'object' ? (link.source as any).id : link.source;
+                                    const tId = typeof link.target === 'object' ? (link.target as any).id : link.target;
+                                    return (sId === node.id && tId === hoveredNode.id) || (sId === hoveredNode.id && tId === node.id);
+                                  });
               
               targetColor = isConnected ? palette.active : palette.faded;
             }
