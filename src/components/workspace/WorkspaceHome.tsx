@@ -22,6 +22,7 @@ import {
   ArrowRight,
   Zap,
   FolderOpen,
+  Calendar,
 } from 'lucide-react'
 
 // ─── Eisenhower Matrix Logic ──────────────────────────────────────────────────
@@ -149,31 +150,39 @@ function DueDateBadge({ dueDateStr }: { dueDateStr: string | null | undefined })
   )
 }
 
-function TaskItem({ issue, quadrant }: { issue: LocalIssue; quadrant: Quadrant }) {
+function TaskRow({ issue }: { issue: LocalIssue }) {
   const { navigate } = useClientNavigate()
-  const meta = QUADRANT_META[quadrant]
+
+  const getPriorityStyle = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'bg-red-500/10 border-red-500/20 text-red-500'
+      case 'high': return 'bg-orange-500/10 border-orange-500/20 text-orange-500'
+      case 'medium': return 'bg-blue-500/10 border-blue-500/20 text-blue-500'
+      case 'low': return 'bg-zinc-500/10 border-zinc-500/20 text-zinc-400'
+      default: return 'bg-zinc-500/5 border-transparent text-zinc-400'
+    }
+  }
 
   return (
     <div
       onClick={() => navigate('/tasks')}
-      className={`group flex items-center gap-2.5 px-3 py-2 rounded-lg border ${meta.border} ${meta.bg} hover:brightness-95 dark:hover:brightness-110 transition-all duration-150 cursor-pointer`}
+      className="group flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border-main/40 bg-zinc-50/30 dark:bg-zinc-900/10 hover:bg-hover-bg hover:border-border-strong/20 transition-all duration-150 cursor-pointer min-w-0"
     >
-      {/* Quadrant dot */}
-      <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${meta.dot}`} />
+      {/* Priority Indicator Badge */}
+      <span className={`flex items-center justify-center p-1 rounded-md border shrink-0 ${getPriorityStyle(issue.priority)}`}>
+        {getPriorityIcon(issue.priority) || <div className="w-3 h-3 rounded-full bg-zinc-400/50" />}
+      </span>
 
-      {/* Priority icon */}
-      {getPriorityIcon(issue.priority)}
-
-      {/* Title */}
-      <span className="flex-1 text-xs font-medium text-foreground truncate">
+      {/* Task Title */}
+      <span className="flex-1 text-[11px] font-medium text-foreground truncate select-none">
         {issue.title}
       </span>
 
-      {/* Due date */}
-      <DueDateBadge dueDateStr={issue.due_date} />
+      {/* Due date Badge */}
+      {issue.due_date && <DueDateBadge dueDateStr={issue.due_date} />}
 
-      {/* Arrow on hover */}
-      <ArrowRight className="w-3 h-3 text-secondary/40 opacity-0 group-hover:opacity-100 shrink-0 transition-opacity" />
+      {/* Hover Arrow */}
+      <ArrowRight className="w-3 h-3 text-secondary/40 opacity-0 group-hover:opacity-100 shrink-0 transition-opacity ml-1" />
     </div>
   )
 }
@@ -221,8 +230,8 @@ function PriorityPanel() {
 
   return (
     <div className="flex flex-col gap-1.5">
-      {sortedTasks.slice(0, VISIBLE_COUNT).map(({ issue, quadrant }) => (
-        <TaskItem key={issue.id} issue={issue} quadrant={quadrant} />
+      {sortedTasks.slice(0, VISIBLE_COUNT).map(({ issue }) => (
+        <TaskRow key={issue.id} issue={issue} />
       ))}
       {sortedTasks.length > VISIBLE_COUNT && (
         <button
@@ -372,8 +381,40 @@ interface WorkspaceHomeProps {
 }
 
 export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onSelectLink }: WorkspaceHomeProps) {
+  const { issues } = useContext(TasksContext)
+  const { navigate } = useClientNavigate()
+
+  const todayTasks = useMemo(() => {
+    if (!issues) return []
+    const now = new Date()
+    return issues.filter(i => {
+      if (i.status === 'done' || i.status === 'canceled' || i.is_deleted === 1) return false
+      if (!i.due_date) return false
+      
+      const due = new Date(i.due_date)
+      return due.getFullYear() === now.getFullYear() &&
+             due.getMonth() === now.getMonth() &&
+             due.getDate() === now.getDate()
+    })
+  }, [issues])
+
+  const priorityTasks = useMemo(() => {
+    if (!issues) return []
+    return issues
+      .filter(i => i.status !== 'done' && i.status !== 'canceled' && i.is_deleted === 0)
+      .sort((a, b) => {
+        const scoreA = PRIORITY_SCORE[a.priority] || 0
+        const scoreB = PRIORITY_SCORE[b.priority] || 0
+        if (scoreB !== scoreA) return scoreB - scoreA
+        
+        const daysA = getDaysUntilDue(a.due_date) ?? 9999
+        const daysB = getDaysUntilDue(b.due_date) ?? 9999
+        return daysA - daysB
+      })
+  }, [issues])
+
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden">
+    <div className="flex flex-col flex-1 h-full overflow-hidden bg-background">
 
       {/* ── Header bar — y hệt trang Tasks ── */}
       <header className="flex flex-col bg-background shrink-0 select-none">
@@ -386,18 +427,82 @@ export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onS
 
       {/* ── Scrollable content ── */}
       <div className="flex-1 overflow-y-auto no-scrollbar">
-        <div className="max-w-3xl mx-auto w-full px-6 py-6 flex flex-col gap-8">
+        <div className="max-w-3xl mx-auto w-full px-6 py-6 flex flex-col gap-6">
 
-          {/* Section 1: Priority Tasks */}
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Zap className="w-3.5 h-3.5 text-amber-500" />
-              <h2 className="text-xs font-bold uppercase tracking-wider text-secondary/70">
-                Ưu tiên cao nhất
-              </h2>
+          {/* Section 1: Dashboard Cards (Today's Tasks & Highest Priority Tasks) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Panel 1: Today's Tasks */}
+            <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 shadow-subtle hover:shadow-hover transition-all duration-200">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
+                <Calendar className="w-4 h-4 text-blue-500" strokeWidth={2} />
+                <h3 className="text-xs font-semibold text-foreground tracking-tight">Nhiệm vụ hôm nay</h3>
+                {todayTasks.length > 0 && (
+                  <span className="ml-auto text-[10px] font-bold bg-blue-500/10 text-blue-500 px-1.5 py-0.5 rounded-full">
+                    {todayTasks.length}
+                  </span>
+                )}
+              </div>
+              <div className="flex-1 flex flex-col gap-2 min-h-0">
+                {todayTasks.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center py-6 text-center gap-1.5">
+                    <CheckCircle2 className="w-7 h-7 text-emerald-500/30" strokeWidth={1.5} />
+                    <p className="text-[11px] font-medium text-secondary/60">Không có nhiệm vụ nào cần hoàn thành hôm nay</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {todayTasks.slice(0, 5).map(issue => (
+                      <TaskRow key={issue.id} issue={issue} />
+                    ))}
+                    {todayTasks.length > 5 && (
+                      <button
+                        onClick={() => navigate('/tasks')}
+                        className="text-[10px] text-secondary hover:text-primary font-medium pt-1 text-center transition-colors cursor-pointer"
+                      >
+                        Xem thêm {todayTasks.length - 5} nhiệm vụ khác →
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-            <PriorityPanel />
-          </section>
+
+            {/* Panel 2: Highest Priority Tasks */}
+            <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 shadow-subtle hover:shadow-hover transition-all duration-200">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
+                <Zap className="w-4 h-4 text-amber-500" strokeWidth={2} />
+                <h3 className="text-xs font-semibold text-foreground tracking-tight">Ưu tiên cao nhất</h3>
+                {priorityTasks.length > 0 && (
+                  <span className="ml-auto text-[10px] font-bold bg-amber-500/10 text-amber-500 px-1.5 py-0.5 rounded-full">
+                    {priorityTasks.filter(i => i.priority === 'urgent' || i.priority === 'high').length}
+                  </span>
+                )}
+              </div>
+              <div className="flex-1 flex flex-col gap-2 min-h-0">
+                {priorityTasks.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center py-6 text-center gap-1.5">
+                    <CheckCircle2 className="w-7 h-7 text-emerald-500/30" strokeWidth={1.5} />
+                    <p className="text-[11px] font-medium text-secondary/60">Không có nhiệm vụ ưu tiên nào</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {priorityTasks.slice(0, 5).map(issue => (
+                      <TaskRow key={issue.id} issue={issue} />
+                    ))}
+                    {priorityTasks.length > 5 && (
+                      <button
+                        onClick={() => navigate('/tasks')}
+                        className="text-[10px] text-secondary hover:text-primary font-medium pt-1 text-center transition-colors cursor-pointer"
+                      >
+                        Xem tất cả nhiệm vụ →
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
 
           {/* Divider */}
           <div className="border-t border-border-main" />
