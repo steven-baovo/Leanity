@@ -27,7 +27,7 @@
   --border-gray-bg: #d4d4d8;
   /* Zinc 300 for borders on gray backgrounds */
   --hover-bg: rgba(0, 0, 0, 0.05);
-  /* Lớp phủ xám mờ tinh tế nổi bật trên cả nền #f2f2f2 */
+  /* Lớp phủ xám mờ tinh tế nổi bật trên cả nền #fcfdfe */
   --active-bg: rgba(0, 0, 0, 0.08);
   /* Lớp phủ active xám đậm hơn */
 

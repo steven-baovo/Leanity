@@ -62,7 +62,7 @@ export default function FrontendLayout({
           {/* Global shortcuts */}
           <GlobalKeyboardListener />
           <QuickCreateModal />
-          <div className="flex flex-col lg:flex-row h-screen bg-[#f2f2f2] dark:bg-background overflow-hidden p-[5px] gap-[5px]">
+          <div className="flex flex-col lg:flex-row h-screen bg-[#fcfdfe] dark:bg-background overflow-hidden p-[5px] gap-[5px] lg:p-0 lg:gap-0">
             {/* Mobile Navigation */}
             <MobileNavigationWrapper user={user} />
 

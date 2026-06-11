@@ -57,7 +57,7 @@ export default function MainSidebar() {
 
   return (
     <AppSidebarFrame defaultWidth={300}>
-      <div className="w-full h-full flex flex-col p-4 select-none">
+      <div className="w-full h-full flex flex-col pt-[10px] px-4 pb-4 select-none">
         {/* Header containing User Profile Dropdown */}
         <SidebarHeader />
 

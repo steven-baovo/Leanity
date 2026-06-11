@@ -110,7 +110,6 @@ export default function TasksSection() {
   }).sort((a, b) => b.startDate.localeCompare(a.startDate));
 
   const isMyTasksActive = isClient && route.type === 'tasks';
-  const isProjectsHeaderActive = isClient && route.type === 'projects';
 
   return (
     <>
@@ -130,79 +129,6 @@ export default function TasksSection() {
             </div>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-200/50 dark:bg-zinc-800/50 text-secondary">{(dbIssues || []).length}</span>
           </div>
-        </div>
-
-        {/* Projects */}
-        <div className="flex flex-col gap-1">
-          <div className="relative group/header">
-            <div
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/projects');
-              }}
-              className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isProjectsHeaderActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
-            >
-              <div className="flex items-center gap-2">
-                <Box className="w-3.5 h-3.5 text-zinc-400/80" />
-                <span className="font-medium text-[13px]">Projects</span>
-              </div>
-              <div className="flex items-center gap-0.5">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    navigate('/cycles');
-                  }}
-                  className="p-0.5 rounded hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
-                  title="Xem Cycles"
-                >
-                  {getCycleIcon("w-3.5 h-3.5")}
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setIsProjectsExpanded(!isProjectsExpanded);
-                  }}
-                  className="p-0.5 rounded hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
-                >
-                  <ChevronDown className={`w-3.5 h-3.5 transform transition-transform ${isProjectsExpanded ? '' : '-rotate-90'}`} />
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          {isProjectsExpanded && (
-            <div className="space-y-0.5">
-              {projects.map(project => {
-                const count = (dbIssues || []).filter(i => i.project_id === project.id).length;
-                const progress = projectProgress[project.id] || 0;
-                const isActive = isClient && route.type === 'project' && route.id === project.id;
-                
-                return (
-                  <div
-                    key={project.id}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate(`/project/${project.id}`);
-                    }}
-                    className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
-                  >
-                    <div className="flex items-center gap-2 min-w-0 pl-1.5">
-                      <div className="relative w-3.5 h-3.5 flex items-center justify-center shrink-0" title={`Tiến độ: ${progress}%`}>
-                        <svg className="w-full h-full transform -rotate-90">
-                          <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" className="text-zinc-200 dark:text-zinc-800" strokeWidth="1.5" />
-                          <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" className="text-zinc-500 dark:text-zinc-400" strokeDasharray="31.4" strokeDashoffset={31.4 - (31.4 * progress) / 100} strokeWidth="1.5" />
-                        </svg>
-                      </div>
-                      <span className="truncate">{project.name}</span>
-                    </div>
-                    <span className="text-[10px] text-zinc-400 font-medium px-1">{count}</span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
       </div>
     </>

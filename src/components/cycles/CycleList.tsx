@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useClientNavigate } from '@/hooks/useClientNavigate';
-import { History, Plus, Calendar, Activity, ChevronRight, Box, Target } from 'lucide-react';
+import { History, Plus, Calendar, Activity, ChevronRight, Box, Target, CheckSquare } from 'lucide-react';
 import { useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
 import { getCycleIcon } from '@/types/models';
 
@@ -73,41 +73,42 @@ export default function CycleList() {
     <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-background">
       {/* Header */}
       <header className="flex flex-col bg-background shrink-0 select-none">
-        {/* Dòng 1: Tiêu đề chính */}
-        <div className="flex items-center justify-between px-4 h-[44px] border-b border-border-main shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
-            {getCycleIcon("w-3.5 h-3.5 text-zinc-500 shrink-0")}
-            <h1 className="text-standard tracking-tight font-medium text-standard-text truncate leading-none">Cycles</h1>
+        {/* Dòng 1: Thanh điều hướng phân đoạn */}
+        <div className="flex items-stretch justify-between px-4 h-[44px] border-b border-border-main shrink-0">
+          <div className="flex items-stretch gap-6 h-full text-xs select-none">
+            <button
+              onClick={() => navigate('/tasks')}
+              className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-transparent text-zinc-400 dark:text-zinc-500 hover:text-foreground hover:border-zinc-300 dark:hover:border-zinc-700"
+            >
+              <CheckSquare className="w-3.5 h-3.5" />
+              <span>Tasks</span>
+            </button>
+            <button
+              onClick={() => navigate('/projects')}
+              className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-transparent text-zinc-400 dark:text-zinc-500 hover:text-foreground hover:border-zinc-300 dark:hover:border-zinc-700"
+            >
+              <Box className="w-3.5 h-3.5" />
+              <span>Project</span>
+            </button>
+            <button
+              onClick={() => navigate('/okrs')}
+              className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-transparent text-zinc-400 dark:text-zinc-500 hover:text-foreground hover:border-zinc-300 dark:hover:border-zinc-700"
+            >
+              <Target className="w-3.5 h-3.5" />
+              <span>OKRs</span>
+            </button>
+            <button
+              onClick={() => navigate('/cycles')}
+              className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-zinc-900 dark:border-zinc-100 text-foreground font-semibold"
+            >
+              <Activity className="w-3.5 h-3.5" />
+              <span>Cycle</span>
+            </button>
           </div>
         </div>
 
         {/* Dòng 2: Thanh công cụ dưới đường viền */}
-        <div className="flex items-center justify-between gap-4 flex-wrap p-4">
-          {/* Nhóm bên trái: Điều hướng phân đoạn (Segmented Tabs) */}
-            <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-border-main p-1 rounded-lg text-xs select-none">
-              <button
-                onClick={() => navigate('/okrs')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground dark:hover:text-foreground rounded-md text-[11px] font-medium transition-all cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/40 border border-transparent"
-              >
-                <Target className="w-3.5 h-3.5" />
-                <span>OKRs</span>
-              </button>
-              <button
-                onClick={() => navigate('/projects')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground dark:hover:text-foreground rounded-md text-[11px] font-medium transition-all cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/40 border border-transparent"
-              >
-                <Box className="w-3.5 h-3.5" />
-                <span>Project</span>
-              </button>
-              <button
-                onClick={() => navigate('/cycles')}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-foreground rounded-md text-[11px] font-semibold transition-all cursor-pointer border border-transparent"
-              >
-                <Activity className="w-3.5 h-3.5" />
-                <span>Cycle</span>
-              </button>
-            </div>
-
+        <div className="flex items-center justify-end gap-4 flex-wrap p-4">
           {/* Nhóm bên phải: Nút Tạo chu kỳ */}
           <div className="flex items-center gap-3 shrink-0">
             <button

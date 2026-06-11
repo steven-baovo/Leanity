@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useClientNavigate } from '@/hooks/useClientNavigate';
 import { 
   Search, Plus, List, LayoutGrid, Calendar, ChevronDown, X, Command, Trash2,
-  Tag, Box, History, Maximize2, Check, Paperclip, Folder, Clock, Play
+  Tag, Box, History, Maximize2, Check, Paperclip, Folder, Clock, Play, CheckSquare, Target, Activity
 } from 'lucide-react';
 import { useLocalIssues, useLocalProjects, useLocalCycles } from '@/lib/local-first/useLocalTasks';
 import { 
@@ -232,10 +232,45 @@ export default function IssueList({
       
       {!hideHeader && (
         <header className="flex flex-col bg-background shrink-0 select-none">
-          {/* Dòng 1: Tiêu đề (nếu có và không ẩn) */}
-          {!hideTitle && title && (
-            <div className="flex items-center justify-between px-4 h-[44px] border-b border-border-main shrink-0">
-              <h1 className="text-standard tracking-tight font-medium text-standard-text truncate leading-none">{title}</h1>
+          {/* Dòng 1: Tiêu đề hoặc Segmented Tabs */}
+          {!hideTitle && (
+            <div className="flex items-stretch justify-between px-4 h-[44px] border-b border-border-main shrink-0">
+              {!projectId && !cycleId ? (
+                <div className="flex items-stretch gap-6 h-full text-xs select-none">
+                  <button
+                    onClick={() => navigate('/tasks')}
+                    className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-zinc-900 dark:border-zinc-100 text-foreground font-semibold"
+                  >
+                    <CheckSquare className="w-3.5 h-3.5" />
+                    <span>Tasks</span>
+                  </button>
+                  <button
+                    onClick={() => navigate('/projects')}
+                    className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-transparent text-zinc-400 dark:text-zinc-500 hover:text-foreground hover:border-zinc-300 dark:hover:border-zinc-700"
+                  >
+                    <Box className="w-3.5 h-3.5" />
+                    <span>Project</span>
+                  </button>
+                  <button
+                    onClick={() => navigate('/okrs')}
+                    className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-transparent text-zinc-400 dark:text-zinc-500 hover:text-foreground hover:border-zinc-300 dark:hover:border-zinc-700"
+                  >
+                    <Target className="w-3.5 h-3.5" />
+                    <span>OKRs</span>
+                  </button>
+                  <button
+                    onClick={() => navigate('/cycles')}
+                    className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-transparent text-zinc-400 dark:text-zinc-500 hover:text-foreground hover:border-zinc-300 dark:hover:border-zinc-700"
+                  >
+                    <Activity className="w-3.5 h-3.5" />
+                    <span>Cycle</span>
+                  </button>
+                </div>
+              ) : title ? (
+                <div className="flex items-center h-full">
+                  <h1 className="text-standard tracking-tight font-medium text-standard-text truncate leading-none">{title}</h1>
+                </div>
+              ) : null}
             </div>
           )}
 
