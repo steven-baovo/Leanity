@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAppRouter } from '@/contexts/AppRouterContext';
 import { useClientNavigate } from '@/hooks/useClientNavigate';
-import { Timer, BarChart2, Plus } from 'lucide-react';
+import { Timer, BarChart2, Plus, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppSidebarFrame from '@/components/sidebar/AppSidebarFrame';
 import TasksSection from './TasksSection';
@@ -41,6 +41,13 @@ export default function MainSidebar() {
   }, []);
 
   const actionItems = [
+    {
+      href: '/docs',
+      title: 'Tài liệu hướng dẫn',
+      icon: HelpCircle,
+      active: false,
+      newTab: true,
+    },
     {
       href: '/pomodoro',
       title: 'Tập trung Pomodoro',
@@ -86,10 +93,17 @@ export default function MainSidebar() {
               >
                 {actionItems.map((item, idx) => {
                   const Icon = item.icon;
+                  const handleClick = () => {
+                    if (item.newTab) {
+                      window.open(item.href, '_blank', 'noopener,noreferrer');
+                    } else {
+                      navigate(item.href);
+                    }
+                  };
                   return (
                     <button
                       key={idx}
-                      onClick={() => navigate(item.href)}
+                      onClick={handleClick}
                       className={`group relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-subtle hover:shadow-floating hover:scale-105 active:scale-95 cursor-pointer ${
                         item.active
                           ? 'bg-primary text-white border border-transparent'
