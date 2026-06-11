@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useMemo, useState, useContext } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '@/lib/local-first/db'
 import { useClientNavigate } from '@/hooks/useClientNavigate'
 import { TasksContext } from '@/lib/local-first/TasksProvider'
 import { LocalIssue } from '@/lib/local-first/db'
@@ -9,9 +11,6 @@ import {
   AlertCircle,
   ChevronsUp,
   ChevronUp,
-  GitFork,
-  Share2,
-  ChevronRight,
   ChevronDown,
   Clock,
   Folder,
@@ -23,6 +22,12 @@ import {
   Zap,
   FolderOpen,
   Calendar,
+  Timer,
+  CheckSquare,
+  Activity,
+  TrendingUp,
+  Award,
+  Briefcase,
 } from 'lucide-react'
 
 // ─── Eisenhower Matrix Logic ──────────────────────────────────────────────────
@@ -65,7 +70,6 @@ function getUrgencyScore(issue: LocalIssue): number {
   let score = PRIORITY_SCORE[issue.priority] * 1000
   const days = getDaysUntilDue(issue.due_date)
   if (days !== null) {
-    // Gần hạn hơn → điểm cao hơn
     score += Math.max(0, 365 - days)
   }
   if (issue.status === 'in_progress') score += 50
@@ -73,38 +77,7 @@ function getUrgencyScore(issue: LocalIssue): number {
   return score
 }
 
-// ─── Task Card ────────────────────────────────────────────────────────────────
-
-const QUADRANT_META: Record<Quadrant, { label: string; color: string; bg: string; border: string; dot: string }> = {
-  Q1: {
-    label: 'Làm ngay',
-    color: 'text-red-500',
-    bg: 'bg-red-50 dark:bg-red-500/5',
-    border: 'border-red-200 dark:border-red-500/20',
-    dot: 'bg-red-500',
-  },
-  Q2: {
-    label: 'Lên kế hoạch',
-    color: 'text-indigo-500',
-    bg: 'bg-indigo-50 dark:bg-indigo-500/5',
-    border: 'border-indigo-200 dark:border-indigo-500/20',
-    dot: 'bg-indigo-500',
-  },
-  Q3: {
-    label: 'Cần chú ý',
-    color: 'text-amber-500',
-    bg: 'bg-amber-50 dark:bg-amber-500/5',
-    border: 'border-amber-200 dark:border-amber-500/20',
-    dot: 'bg-amber-500',
-  },
-  Q4: {
-    label: 'Ít quan trọng',
-    color: 'text-zinc-400',
-    bg: 'bg-zinc-50 dark:bg-zinc-800/30',
-    border: 'border-zinc-200 dark:border-zinc-700/50',
-    dot: 'bg-zinc-400',
-  },
-}
+// ─── Task Card & Badges ───────────────────────────────────────────────────────
 
 function getPriorityIcon(priority: string) {
   const cls = 'w-3.5 h-3.5 shrink-0 text-secondary/70 group-hover:text-foreground transition-colors'
@@ -173,64 +146,6 @@ function TaskRow({ issue }: { issue: LocalIssue }) {
 
       {/* Hover Arrow */}
       <ArrowRight className="w-3 h-3 text-secondary/40 opacity-0 group-hover:opacity-100 shrink-0 transition-opacity ml-1" />
-    </div>
-  )
-}
-
-// ─── Priority Panel ───────────────────────────────────────────────────────────
-
-function PriorityPanel() {
-  const { issues } = useContext(TasksContext)
-  const { navigate } = useClientNavigate()
-
-  const sortedTasks = useMemo(() => {
-    if (!issues) return []
-    return issues
-      .filter(i => i.status !== 'done' && i.status !== 'canceled' && i.is_deleted === 0)
-      .map(i => ({ issue: i, quadrant: classifyTask(i), score: getUrgencyScore(i) }))
-      .sort((a, b) => {
-        const qDiff = QUADRANT_ORDER[a.quadrant] - QUADRANT_ORDER[b.quadrant]
-        if (qDiff !== 0) return qDiff
-        return b.score - a.score
-      })
-  }, [issues])
-
-  if (!issues) {
-    return (
-      <div className="flex items-center gap-2 text-xs text-secondary/50 py-2">
-        <div className="w-3 h-3 rounded-full bg-primary/20 animate-pulse" />
-        Đang tải tasks...
-      </div>
-    )
-  }
-
-  if (sortedTasks.length === 0) {
-    return (
-      <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-200 dark:border-emerald-500/20">
-        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-        <div>
-          <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Không có task nào cần chú ý</p>
-          <p className="text-[11px] text-secondary/60 mt-0.5">Mọi task đang trong tình trạng tốt 🎉</p>
-        </div>
-      </div>
-    )
-  }
-
-  const VISIBLE_COUNT = 6
-
-  return (
-    <div className="flex flex-col gap-1.5">
-      {sortedTasks.slice(0, VISIBLE_COUNT).map(({ issue }) => (
-        <TaskRow key={issue.id} issue={issue} />
-      ))}
-      {sortedTasks.length > VISIBLE_COUNT && (
-        <button
-          onClick={() => navigate('/tasks')}
-          className="text-[11px] text-secondary hover:text-primary font-medium py-1.5 text-center transition-colors cursor-pointer"
-        >
-          Xem thêm {sortedTasks.length - VISIBLE_COUNT} task khác →
-        </button>
-      )}
     </div>
   )
 }
@@ -371,9 +286,125 @@ interface WorkspaceHomeProps {
 }
 
 export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onSelectLink }: WorkspaceHomeProps) {
-  const { issues } = useContext(TasksContext)
   const { navigate } = useClientNavigate()
+  const { issues } = useContext(TasksContext)
 
+  // Query focus sessions from database
+  const sessions = useLiveQuery(() => db.focus_sessions.toArray()) || []
+
+  // --- 1. TÍNH TOÁN CÁC CHỈ SỐ TỔNG QUAN (METRICS) ---
+  const stats = useMemo(() => {
+    const completedPomodoros = sessions.filter(s => s.is_completed && s.session_type === 'pomodoro')
+    const totalFocusMinutes = completedPomodoros.reduce((sum, s) => sum + s.duration_minutes, 0)
+    const completedIssuesCount = (issues || []).filter(i => i.status === 'done' && i.is_deleted === 0).length
+    const pendingIssuesCount = (issues || []).filter(i => i.status !== 'done' && i.status !== 'canceled' && i.is_deleted === 0).length
+
+    const hours = Math.floor(totalFocusMinutes / 60)
+    const mins = totalFocusMinutes % 60
+    const focusTimeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`
+
+    return {
+      focusTimeStr,
+      pomodorosCount: completedPomodoros.length,
+      completedIssuesCount,
+      pendingIssuesCount,
+      totalFocusMinutes
+    }
+  }, [sessions, issues])
+
+  // --- 2. TÍNH TOÁN DỮ LIỆU XU HƯỚNG 7 NGÀY GẦN NHẤT ---
+  const dailyFocusTrend = useMemo(() => {
+    const days = []
+    const now = new Date()
+    
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(now.getDate() - i)
+      const dateString = d.toISOString().split('T')[0]
+      
+      const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
+      const dayLabel = daysOfWeek[d.getDay()]
+      
+      const dayMinutes = sessions
+        .filter(s => {
+          if (!s.is_completed || s.session_type !== 'pomodoro') return false
+          const sessionDate = s.completed_at ? s.completed_at.split('T')[0] : s.created_at.split('T')[0]
+          return sessionDate === dateString
+        })
+        .reduce((sum, s) => sum + s.duration_minutes, 0)
+
+      days.push({
+        label: dayLabel,
+        minutes: dayMinutes,
+        date: dateString
+      })
+    }
+    return days
+  }, [sessions])
+
+  const maxDailyMinutes = useMemo(() => {
+    const max = Math.max(...dailyFocusTrend.map(d => d.minutes), 0)
+    return max === 0 ? 60 : max
+  }, [dailyFocusTrend])
+
+  // --- 3. PHÂN BỔ THỜI GIAN (POMO VS BREAK) ---
+  const timeAllocation = useMemo(() => {
+    let focus = 0
+    let breakTime = 0
+
+    sessions.forEach(s => {
+      if (!s.is_completed) return
+      if (s.session_type === 'pomodoro') {
+        focus += s.duration_minutes
+      } else {
+        breakTime += s.duration_minutes
+      }
+    })
+
+    const total = focus + breakTime
+    const focusPercent = total > 0 ? Math.round((focus / total) * 100) : 100
+    const breakPercent = total > 0 ? Math.round((breakTime / total) * 100) : 0
+
+    return {
+      focus,
+      breakTime,
+      focusPercent,
+      breakPercent,
+      total
+    }
+  }, [sessions])
+
+  // --- 4. DANH SÁCH NHIỆM VỤ HOÀN THÀNH GẦN ĐÂY ---
+  const recentlyCompletedTasks = useMemo(() => {
+    return (issues || [])
+      .filter(i => i.status === 'done' && i.is_deleted === 0)
+      .map(i => ({
+        id: i.id,
+        title: i.title,
+        completedAt: i.updated_at
+      }))
+      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+      .slice(0, 5)
+  }, [issues])
+
+  // --- 5. LỊCH SỬ CÁC PHIÊN TẬP TRUNG GẦN ĐÂY ---
+  const recentSessions = useMemo(() => {
+    return [...sessions]
+      .filter(s => s.is_completed && s.session_type === 'pomodoro')
+      .sort((a, b) => new Date(b.completed_at || b.created_at).getTime() - new Date(a.completed_at || a.created_at).getTime())
+      .slice(0, 5)
+      .map(s => {
+        const matchedIssue = (issues || []).find(i => i.id === s.task_id)
+        return {
+          id: s.id,
+          taskTitle: matchedIssue ? matchedIssue.title : 'Tập trung tự do',
+          duration: s.duration_minutes,
+          completedAt: s.completed_at || s.created_at
+        }
+      })
+  }, [sessions, issues])
+
+  // --- 6. NHIỆM VỤ HÔM NAY VÀ ƯU TIÊN CAO NHẤT ---
   const todayTasks = useMemo(() => {
     if (!issues) return []
     const now = new Date()
@@ -405,8 +436,7 @@ export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onS
 
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden bg-background">
-
-      {/* ── Header bar — y hệt trang Tasks ── */}
+      {/* Header */}
       <header className="flex flex-col bg-background shrink-0 select-none">
         <div className="flex items-center justify-between px-4 h-[44px] border-b border-border-main shrink-0">
           <h1 className="text-standard tracking-tight font-medium text-standard-text truncate leading-none">
@@ -415,13 +445,59 @@ export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onS
         </div>
       </header>
 
-      {/* ── Scrollable content ── */}
+      {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto no-scrollbar">
         <div className="max-w-3xl mx-auto w-full px-6 py-6 flex flex-col gap-6">
 
-          {/* Section 1: Dashboard Cards (Today's Tasks & Highest Priority Tasks) */}
+          {/* Row 1: Bento Grid Metrics */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
+            {/* Metric 1: Total time */}
+            <div className="p-4 bg-surface border border-border-main rounded-default shadow-subtle flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-secondary font-medium tracking-tight uppercase">Tổng thời gian</p>
+                <h3 className="text-sm sm:text-base font-black text-foreground truncate mt-0.5">{stats.focusTimeStr}</h3>
+              </div>
+            </div>
+
+            {/* Metric 2: Pomodoros */}
+            <div className="p-4 bg-surface border border-border-main rounded-default shadow-subtle flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                <Timer className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-secondary font-medium tracking-tight uppercase">Pomodoro</p>
+                <h3 className="text-sm sm:text-base font-black text-foreground truncate mt-0.5">{stats.pomodorosCount} phiên</h3>
+              </div>
+            </div>
+
+            {/* Metric 3: Completed */}
+            <div className="p-4 bg-surface border border-border-main rounded-default shadow-subtle flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+                <CheckSquare className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-secondary font-medium tracking-tight uppercase">Đã hoàn thành</p>
+                <h3 className="text-sm sm:text-base font-black text-foreground truncate mt-0.5">{stats.completedIssuesCount} task</h3>
+              </div>
+            </div>
+
+            {/* Metric 4: Pending */}
+            <div className="p-4 bg-surface border border-border-main rounded-default shadow-subtle flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+                <Briefcase className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-secondary font-medium tracking-tight uppercase">Đang xử lý</p>
+                <h3 className="text-sm sm:text-base font-black text-foreground truncate mt-0.5">{stats.pendingIssuesCount} task</h3>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2: Today's Tasks & Highest Priority Tasks */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            
             {/* Panel 1: Today's Tasks */}
             <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 shadow-subtle hover:shadow-hover transition-all duration-200">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
@@ -491,14 +567,10 @@ export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onS
                 )}
               </div>
             </div>
-
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-border-main" />
-
-          {/* Section 2: Library Grid */}
-          <section className="pb-8">
+          {/* Row 3: Library (Folders & Files Grid) */}
+          <section className="py-2 border-t border-border-main pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Folder className="w-3.5 h-3.5 text-primary/70" />
@@ -514,6 +586,160 @@ export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onS
               onSelectLink={onSelectLink}
             />
           </section>
+
+          {/* Divider */}
+          <div className="border-t border-border-main" />
+
+          {/* Row 4: Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Bar Chart 7 Days (Col-span: 2) */}
+            <div className="lg:col-span-2 p-5 bg-surface border border-border-main rounded-default shadow-subtle flex flex-col min-h-[300px]">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight">Xu hướng tập trung 7 ngày</h2>
+                </div>
+                <span className="text-[11px] text-secondary tracking-tight">Đơn vị: phút</span>
+              </div>
+
+              <div className="flex-1 flex items-end justify-between gap-2 pt-6 px-2">
+                {dailyFocusTrend.map((day, idx) => {
+                  const heightPercent = Math.max((day.minutes / maxDailyMinutes) * 100, 4)
+                  return (
+                    <div key={idx} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+                      <div className="w-full relative flex items-end justify-center h-40">
+                        <div className="absolute bottom-full mb-1.5 px-2 py-0.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 text-[9px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                          {day.minutes} phút
+                        </div>
+                        <div 
+                          style={{ height: `${heightPercent}%` }} 
+                          className={`w-8 sm:w-12 rounded-t-sm transition-all duration-500 ${
+                            day.minutes > 0 
+                              ? 'bg-primary group-hover:bg-primary/80' 
+                              : 'bg-zinc-100 dark:bg-zinc-800/40'
+                          }`}
+                        />
+                      </div>
+                      <span className="text-[11px] text-secondary font-medium tracking-tight mt-1">{day.label}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Time Allocation Pie Chart (Col-span: 1) */}
+            <div className="p-5 bg-surface border border-border-main rounded-default shadow-subtle flex flex-col items-center justify-between min-h-[300px]">
+              <div className="w-full flex items-center gap-2 mb-4 self-start">
+                <Activity className="w-4 h-4 text-emerald-500" />
+                <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight">Phân bổ hoạt động</h2>
+              </div>
+
+              <div className="relative w-36 h-36 flex items-center justify-center my-2">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" className="text-zinc-100 dark:text-zinc-800" strokeWidth="3" />
+                  {stats.totalFocusMinutes > 0 && (
+                    <circle 
+                      cx="18" 
+                      cy="18" 
+                      r="15.915" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      className="text-primary" 
+                      strokeWidth="3.2" 
+                      strokeDasharray={`${timeAllocation.focusPercent} ${100 - timeAllocation.focusPercent}`} 
+                      strokeDashoffset="0" 
+                    />
+                  )}
+                </svg>
+                <div className="absolute flex flex-col items-center justify-center">
+                  <span className="text-lg font-black text-foreground leading-none">{timeAllocation.focusPercent}%</span>
+                  <span className="text-[9px] text-secondary uppercase font-bold tracking-wider mt-0.5">Tập trung</span>
+                </div>
+              </div>
+
+              <div className="w-full space-y-2 mt-4">
+                <div className="flex items-center justify-between text-[11px]">
+                  <div className="flex items-center gap-1.5 font-medium text-secondary">
+                    <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+                    <span>Tập trung</span>
+                  </div>
+                  <span className="font-bold text-foreground">{timeAllocation.focusPercent}% ({timeAllocation.focus}m)</span>
+                </div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <div className="flex items-center gap-1.5 font-medium text-secondary">
+                    <span className="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                    <span>Nghỉ ngơi</span>
+                  </div>
+                  <span className="font-bold text-foreground">{timeAllocation.breakPercent}% ({timeAllocation.breakTime}m)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* History & Lists Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">
+            {/* Completed Tasks List */}
+            <div className="p-5 bg-surface border border-border-main rounded-default shadow-subtle flex flex-col min-h-[250px]">
+              <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight mb-4 flex items-center gap-2">
+                <Award className="w-4 h-4 text-indigo-500" />
+                <span>Nhiệm vụ hoàn thành gần đây</span>
+              </h2>
+
+              <div className="flex-1 space-y-3">
+                {recentlyCompletedTasks.length === 0 ? (
+                  <div className="h-full flex items-center justify-center text-[12px] text-secondary/70 italic py-10">
+                    Chưa có nhiệm vụ nào được hoàn thành gần đây
+                  </div>
+                ) : (
+                  recentlyCompletedTasks.map((task) => (
+                    <div key={task.id} className="flex items-center justify-between p-2.5 rounded hover:bg-hover-bg transition-colors border border-border-main bg-background/50">
+                      <div className="min-w-0 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                        <p className="text-[12px] font-medium text-foreground truncate">{task.title}</p>
+                      </div>
+                      <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-secondary shrink-0 font-bold ml-2">
+                        Dự án
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Focus History List */}
+            <div className="p-5 bg-surface border border-border-main rounded-default shadow-subtle flex flex-col min-h-[250px]">
+              <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight mb-4 flex items-center gap-2">
+                <Timer className="w-4 h-4 text-amber-500" />
+                <span>Lịch sử tập trung gần đây</span>
+              </h2>
+
+              <div className="flex-1 space-y-3">
+                {recentSessions.length === 0 ? (
+                  <div className="h-full flex items-center justify-center text-[12px] text-secondary/70 italic py-10">
+                    Chưa có lịch sử phiên tập trung nào
+                  </div>
+                ) : (
+                  recentSessions.map((session) => (
+                    <div key={session.id} className="flex items-center justify-between p-2.5 rounded hover:bg-hover-bg transition-colors border border-border-main bg-background/50">
+                      <div className="min-w-0 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                        <p className="text-[12px] font-medium text-foreground truncate">{session.taskTitle}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 ml-2">
+                        <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                          +{session.duration}m
+                        </span>
+                        <span className="text-[10px] text-secondary">
+                          {new Date(session.completedAt).toLocaleDateString('vi-VN', { month: 'numeric', day: 'numeric' })}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
