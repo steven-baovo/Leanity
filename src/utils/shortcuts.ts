@@ -36,7 +36,7 @@ export const DEFAULT_SHORTCUTS: ShortcutConfig = {
   custom_bookmarks: []
 };
 
-export const SHORTCUTS_STORAGE_KEY = 'mindlabs-shortcuts-v1';
+export const SHORTCUTS_STORAGE_KEY = 'mindlabs-shortcuts-v2';
 
 export function getStoredShortcuts(): ShortcutConfig {
   if (typeof window === 'undefined') return DEFAULT_SHORTCUTS;

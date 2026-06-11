@@ -15,9 +15,14 @@ export default function MainSidebar() {
   const { navigate } = useClientNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  const isPomodoroActive = route.type === 'pomodoro';
-  const isProductivityActive = route.type === 'productivity';
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isPomodoroActive = mounted && route.type === 'pomodoro';
+  const isProductivityActive = mounted && route.type === 'productivity';
   const isAnyActive = isPomodoroActive || isProductivityActive;
 
   const handleMouseEnter = () => {
