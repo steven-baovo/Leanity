@@ -19,7 +19,6 @@ import {
   Timer,
   Activity,
   TrendingUp,
-  Award,
 } from 'lucide-react'
 
 // ─── Eisenhower Matrix Logic ──────────────────────────────────────────────────
@@ -282,35 +281,7 @@ export default function WorkspaceHome() {
     }
   }, [sessions])
 
-  // --- 4. DANH SÁCH NHIỆM VỤ HOÀN THÀNH GẦN ĐÂY ---
-  const recentlyCompletedTasks = useMemo(() => {
-    return (issues || [])
-      .filter(i => i.status === 'done' && i.is_deleted === 0)
-      .map(i => ({
-        id: i.id,
-        title: i.title,
-        completedAt: i.updated_at
-      }))
-      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
-      .slice(0, 5)
-  }, [issues])
 
-  // --- 5. LỊCH SỬ CÁC PHIÊN TẬP TRUNG GẦN ĐÂY ---
-  const recentSessions = useMemo(() => {
-    return [...sessions]
-      .filter(s => s.is_completed && s.session_type === 'pomodoro')
-      .sort((a, b) => new Date(b.completed_at || b.created_at).getTime() - new Date(a.completed_at || a.created_at).getTime())
-      .slice(0, 5)
-      .map(s => {
-        const matchedIssue = (issues || []).find(i => i.id === s.task_id)
-        return {
-          id: s.id,
-          taskTitle: matchedIssue ? matchedIssue.title : 'Tập trung tự do',
-          duration: s.duration_minutes,
-          completedAt: s.completed_at || s.created_at
-        }
-      })
-  }, [sessions, issues])
 
   // --- 6. NHIỆM VỤ HÔM NAY VÀ ƯU TIÊN CAO NHẤT ---
   const todayTasks = useMemo(() => {
@@ -548,69 +519,7 @@ export default function WorkspaceHome() {
             </div>
           </div>
 
-          {/* History & Lists Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">
-            {/* Completed Tasks List */}
-            <div className="p-5 bg-surface border border-border-main rounded-default flex flex-col min-h-[250px]">
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
-                <Award className="w-4 h-4 text-indigo-500" strokeWidth={2} />
-                <h3 className="text-xs font-semibold text-foreground tracking-tight">Nhiệm vụ hoàn thành gần đây</h3>
-              </div>
 
-              <div className="flex-1 space-y-3">
-                {recentlyCompletedTasks.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-[12px] text-secondary/70 italic py-10">
-                    Chưa có nhiệm vụ nào được hoàn thành gần đây
-                  </div>
-                ) : (
-                  recentlyCompletedTasks.map((task) => (
-                    <div key={task.id} className="flex items-center justify-between p-2.5 rounded hover:bg-hover-bg transition-colors border border-border-main bg-background/50">
-                      <div className="min-w-0 flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-                        <p className="text-[12px] font-medium text-foreground truncate">{task.title}</p>
-                      </div>
-                      <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-secondary shrink-0 font-bold ml-2">
-                        Dự án
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Focus History List */}
-            <div className="p-5 bg-surface border border-border-main rounded-default flex flex-col min-h-[250px]">
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
-                <Timer className="w-4 h-4 text-amber-500" strokeWidth={2} />
-                <h3 className="text-xs font-semibold text-foreground tracking-tight">Lịch sử tập trung gần đây</h3>
-              </div>
-
-              <div className="flex-1 space-y-3">
-                {recentSessions.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-[12px] text-secondary/70 italic py-10">
-                    Chưa có lịch sử phiên tập trung nào
-                  </div>
-                ) : (
-                  recentSessions.map((session) => (
-                    <div key={session.id} className="flex items-center justify-between p-2.5 rounded hover:bg-hover-bg transition-colors border border-border-main bg-background/50">
-                      <div className="min-w-0 flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                        <p className="text-[12px] font-medium text-foreground truncate">{session.taskTitle}</p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0 ml-2">
-                        <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                          +{session.duration}m
-                        </span>
-                        <span className="text-[10px] text-secondary">
-                          {new Date(session.completedAt).toLocaleDateString('vi-VN', { month: 'numeric', day: 'numeric' })}
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
 
         </div>
       </div>
