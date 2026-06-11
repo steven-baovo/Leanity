@@ -107,13 +107,13 @@ const QUADRANT_META: Record<Quadrant, { label: string; color: string; bg: string
 }
 
 function getPriorityIcon(priority: string) {
-  const cls = 'w-3 h-3 shrink-0'
+  const cls = 'w-3.5 h-3.5 shrink-0 text-secondary/70 group-hover:text-foreground transition-colors'
   switch (priority) {
-    case 'urgent': return <AlertCircle className={`${cls} text-red-500`} />
-    case 'high': return <ChevronsUp className={`${cls} text-orange-500`} />
-    case 'medium': return <ChevronUp className={`${cls} text-blue-500`} />
-    case 'low': return <ChevronDown className={`${cls} text-zinc-400`} />
-    default: return null
+    case 'urgent': return <AlertCircle className={cls} />
+    case 'high': return <ChevronsUp className={cls} />
+    case 'medium': return <ChevronUp className={cls} />
+    case 'low': return <ChevronDown className={cls} />
+    default: return <div className="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-1 shrink-0" />
   }
 }
 
@@ -122,20 +122,20 @@ function DueDateBadge({ dueDateStr }: { dueDateStr: string | null | undefined })
   if (days === null) return null
 
   let label = ''
-  let cls = ''
+  let cls = 'text-secondary bg-active-bg'
 
   if (days < 0) {
     label = `Quá hạn ${Math.abs(days)} ngày`
-    cls = 'text-red-500 bg-red-50 dark:bg-red-500/10'
+    cls = 'text-red-500 dark:text-red-400 bg-red-500/5 dark:bg-red-500/10 border border-red-500/10'
   } else if (days === 0) {
     label = 'Hôm nay'
-    cls = 'text-red-500 bg-red-50 dark:bg-red-500/10'
+    cls = 'text-primary dark:text-primary/90 bg-primary/5 border border-primary/10'
   } else if (days === 1) {
     label = 'Ngày mai'
-    cls = 'text-orange-500 bg-orange-50 dark:bg-orange-500/10'
+    cls = 'text-secondary bg-active-bg'
   } else if (days <= 3) {
     label = `Còn ${days} ngày`
-    cls = 'text-amber-600 bg-amber-50 dark:bg-amber-500/10'
+    cls = 'text-secondary bg-active-bg'
   } else {
     const d = new Date(dueDateStr!)
     label = `${d.getDate()}/${d.getMonth() + 1}`
@@ -143,8 +143,8 @@ function DueDateBadge({ dueDateStr }: { dueDateStr: string | null | undefined })
   }
 
   return (
-    <span className={`flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded ${cls}`}>
-      <Clock className="w-2.5 h-2.5 shrink-0" />
+    <span className={`flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded border border-transparent ${cls} shrink-0`}>
+      <Clock className="w-2.5 h-2.5 shrink-0 opacity-70" />
       {label}
     </span>
   )
@@ -153,28 +153,18 @@ function DueDateBadge({ dueDateStr }: { dueDateStr: string | null | undefined })
 function TaskRow({ issue }: { issue: LocalIssue }) {
   const { navigate } = useClientNavigate()
 
-  const getPriorityStyle = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'bg-red-500/10 border-red-500/20 text-red-500'
-      case 'high': return 'bg-orange-500/10 border-orange-500/20 text-orange-500'
-      case 'medium': return 'bg-blue-500/10 border-blue-500/20 text-blue-500'
-      case 'low': return 'bg-zinc-500/10 border-zinc-500/20 text-zinc-400'
-      default: return 'bg-zinc-500/5 border-transparent text-zinc-400'
-    }
-  }
-
   return (
     <div
       onClick={() => navigate('/tasks')}
-      className="group flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border-main/40 bg-zinc-50/30 dark:bg-zinc-900/10 hover:bg-hover-bg hover:border-border-strong/20 transition-all duration-150 cursor-pointer min-w-0"
+      className="group flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-hover-bg transition-colors duration-150 cursor-pointer min-w-0"
     >
-      {/* Priority Indicator Badge */}
-      <span className={`flex items-center justify-center p-1 rounded-md border shrink-0 ${getPriorityStyle(issue.priority)}`}>
-        {getPriorityIcon(issue.priority) || <div className="w-3 h-3 rounded-full bg-zinc-400/50" />}
+      {/* Priority icon (Monochrome and clean) */}
+      <span className="shrink-0">
+        {getPriorityIcon(issue.priority)}
       </span>
 
       {/* Task Title */}
-      <span className="flex-1 text-[11px] font-medium text-foreground truncate select-none">
+      <span className="flex-1 text-[12px] font-normal text-foreground truncate select-none">
         {issue.title}
       </span>
 
@@ -430,7 +420,7 @@ export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onS
         <div className="max-w-3xl mx-auto w-full px-6 py-6 flex flex-col gap-6">
 
           {/* Section 1: Dashboard Cards (Today's Tasks & Highest Priority Tasks) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             
             {/* Panel 1: Today's Tasks */}
             <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 shadow-subtle hover:shadow-hover transition-all duration-200">
