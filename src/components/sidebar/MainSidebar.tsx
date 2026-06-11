@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAppRouter } from '@/contexts/AppRouterContext';
 import { useClientNavigate } from '@/hooks/useClientNavigate';
-import { Timer, BarChart2, Sparkles } from 'lucide-react';
+import { Timer, BarChart2, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppSidebarFrame from '@/components/sidebar/AppSidebarFrame';
 import TasksSection from './TasksSection';
@@ -120,8 +120,9 @@ export default function MainSidebar() {
             <motion.div
               animate={{ rotate: isHovered ? 45 : 0 }}
               transition={{ duration: 0.2 }}
+              className="flex items-center justify-center"
             >
-              <Sparkles className="w-5 h-5" strokeWidth={1.5} />
+              <Plus className="w-5 h-5" strokeWidth={1.5} />
             </motion.div>
           </button>
         </div>

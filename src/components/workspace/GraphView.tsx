@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useMemo, useState, useEffect, useRef } from 'react'
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
+import { forceCollide, forceX, forceY } from 'd3-force-3d'
 import { WorkspaceNode } from '@/lib/node-utils'
 import { Loader2 } from 'lucide-react'
 import { useClientNavigate } from '@/hooks/useClientNavigate'
@@ -47,6 +48,35 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
   const graphRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
+
+  // Hàm cấu hình lực vật lý D3 - dùng chung cho callback ref và useEffect
+  const applyForces = useCallback((instance: any) => {
+    if (!instance) return
+
+    // Lực đẩy vừa phải: node đẩy nhau ra nhưng không quá mạnh
+    const chargeForce = instance.d3Force('charge')
+    if (chargeForce) chargeForce.strength(-40)
+
+    // Link ngắn: node liên kết tụ sát nhau
+    const linkForce = instance.d3Force('link')
+    if (linkForce) linkForce.distance(35)
+
+    // Collision: đủ để text không đè lên nhau (khoảng cách ~30px giữa 2 node)
+    instance.d3Force('collide', forceCollide(30))
+
+    // Lực hấp dẫn về trung tâm: kéo node rời rạc vào gần (như Obsidian)
+    // strength 0.08 = nhẹ nhàng, không override lực link
+    instance.d3Force('gravX', forceX(0).strength(0.08))
+    instance.d3Force('gravY', forceY(0).strength(0.08))
+
+    instance.d3ReheatSimulation()
+  }, [])
+
+  // Callback ref: cấu hình forces ngay khi ForceGraph2D được mount vào DOM
+  const setGraphRef = useCallback((instance: any) => {
+    graphRef.current = instance
+    applyForces(instance)
+  }, [applyForces])
 
   // Đo đạc kích thước thực tế của parent container bằng ResizeObserver để tránh tràn màn hình sang phải
   useEffect(() => {
@@ -104,26 +134,6 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
 
     return () => observer.disconnect()
   }, [])
-
-  // Điều chỉnh các lực đẩy vật lý D3 để tránh chồng chéo các node và text labels
-  useEffect(() => {
-    if (graphRef.current) {
-      // Tăng lực đẩy (repulsion) giữa các node để dạt ra xa nhau hơn (default là -30)
-      const chargeForce = graphRef.current.d3Force('charge')
-      if (chargeForce) {
-        chargeForce.strength(-180)
-      }
-      
-      // Tăng khoảng cách liên kết tối thiểu (default là 30)
-      const linkForce = graphRef.current.d3Force('link')
-      if (linkForce) {
-        linkForce.distance(80)
-      }
-
-      // Đun nóng lại bộ mô phỏng vật lý để áp dụng thay đổi ngay lập tức
-      graphRef.current.d3ReheatSimulation()
-    }
-  }, [graphData])
 
   // 1. Xử lý dữ liệu đồ thị (Bao gồm Note, Canvas/Map, Link, và Folder)
   const { graphData } = useMemo(() => {
@@ -193,7 +203,10 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
     }
   }, [nodes])
 
-
+  // Áp dụng lại các lực khi graphData thay đổi (nodes/edges mới)
+  useEffect(() => {
+    applyForces(graphRef.current)
+  }, [graphData, applyForces])
 
   return (
     <div ref={containerRef} className="w-full h-full bg-background relative">
@@ -208,11 +221,11 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
         </div>
       ) : (
         <ForceGraph2D
-          ref={graphRef}
+          ref={setGraphRef}
           graphData={graphData}
           width={dimensions.width}
           height={dimensions.height}
-          nodeLabel="name"
+          nodeLabel={() => ''}
           backgroundColor={isDark ? '#08080a' : '#ffffff'}
           
           // Tự vẽ Node và Chữ (Vẽ Canvas)
@@ -283,7 +296,7 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
           
           linkColor={link => {
             const l = link as any
-            const defaultColorStr = isDark ? '#1f1f23' : '#E5E7EB';
+            const defaultColorStr = isDark ? '#3f3f46' : '#d1d5db';
             
             if (hoverProgress < 0.001) return defaultColorStr;
             
@@ -291,7 +304,7 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
             const targetId = typeof l.target === 'object' ? l.target.id : l.target;
             
             const palette = isDark ? COLORS.dark : COLORS.light;
-            const normalRGB = isDark ? { r: 31, g: 31, b: 35 } : { r: 229, g: 231, b: 235 };
+            const normalRGB = isDark ? { r: 63, g: 63, b: 70 } : { r: 209, g: 213, b: 219 };
             
             let targetRGB = normalRGB;
             if (hoveredNode) {
@@ -303,6 +316,18 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
             }
             
             return interpolateColor(normalRGB, targetRGB, hoverProgress);
+          }}
+          
+          linkWidth={link => {
+            const l = link as any
+            if (hoveredNode) {
+              const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
+              const targetId = typeof l.target === 'object' ? l.target.id : l.target;
+              if (sourceId === hoveredNode.id || targetId === hoveredNode.id) {
+                return 2; // Làm nổi bật đường kết nối khi hover node
+              }
+            }
+            return 1.2; // Độ dày mặc định rõ hơn một chút so với mặc định 1
           }}
           
           onNodeHover={node => {
@@ -321,6 +346,12 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
             }
           }}
           d3VelocityDecay={0.4}
+          // Sau khi simulation ổn định → tự zoom vừa khung hình (như Obsidian)
+          onEngineStop={() => {
+            if (graphRef.current) {
+              graphRef.current.zoomToFit(400, 60)
+            }
+          }}
         />
       )}
     </div>
