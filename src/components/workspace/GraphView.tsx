@@ -181,7 +181,11 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
           
           // Tự vẽ Node và Chữ (Vẽ Canvas)
           nodeCanvasObject={(node: any, ctx, globalScale) => {
-            const label = node.name;
+            let label = node.name || '';
+            const MAX_LENGTH = 20;
+            if (label.length > MAX_LENGTH) {
+              label = label.substring(0, MAX_LENGTH) + '...';
+            }
             
             const palette = isDark ? COLORS.dark : COLORS.light;
             let targetColor = palette.normal;
