@@ -52,6 +52,15 @@ export default function FrontendLayout({
     }
 
     checkSession()
+
+    // 3. Khóa cuộn màn hình khi ở trong Workspace
+    document.documentElement.classList.add('overflow-hidden')
+    document.body.classList.add('overflow-hidden')
+
+    return () => {
+      document.documentElement.classList.remove('overflow-hidden')
+      document.body.classList.remove('overflow-hidden')
+    }
   }, [])
 
   return (

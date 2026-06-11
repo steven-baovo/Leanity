@@ -151,7 +151,6 @@
 }
 
 html {
-  overflow: hidden;
   height: 100%;
 }
 
@@ -163,7 +162,6 @@ body {
   letter-spacing: -0.022em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
   height: 100%;
 }
 
