@@ -6,21 +6,15 @@ import { db } from '@/lib/local-first/db'
 import { useClientNavigate } from '@/hooks/useClientNavigate'
 import { TasksContext } from '@/lib/local-first/TasksProvider'
 import { LocalIssue } from '@/lib/local-first/db'
-import { buildTree, TreeNode, WorkspaceNode, getNodeIconData } from '@/lib/node-utils'
 import {
   AlertCircle,
   ChevronsUp,
   ChevronUp,
   ChevronDown,
   Clock,
-  Folder,
-  FileText,
-  Network,
-  Globe,
   CheckCircle2,
   ArrowRight,
   Zap,
-  FolderOpen,
   Calendar,
   Timer,
   CheckSquare,
@@ -150,142 +144,9 @@ function TaskRow({ issue }: { issue: LocalIssue }) {
   )
 }
 
-// ─── File Grid (Google Drive style) ───────────────────────────────────────────
-
-function FileTypeIcon({ type, url, size = 'md' }: { type: string; url?: string | null; size?: 'sm' | 'md' | 'lg' }) {
-  const { icon: Icon, color } = getNodeIconData(type, url)
-  const sizeMap = { sm: 'w-5 h-5', md: 'w-7 h-7', lg: 'w-9 h-9' }
-
-  if (type === 'folder') {
-    return <Folder className={`${sizeMap[size]} text-primary/70`} strokeWidth={1.5} />
-  }
-
-  return <Icon className={`${sizeMap[size]} ${color}`} strokeWidth={1.5} />
-}
-
-function FileCard({
-  node,
-  onOpen,
-  openFolderId,
-  setOpenFolderId,
-}: {
-  node: TreeNode
-  onOpen: (node: TreeNode) => void
-  openFolderId: string | null
-  setOpenFolderId: (id: string | null) => void
-}) {
-  const isFolder = node.type === 'folder'
-  const isOpen = openFolderId === node.id
-
-  return (
-    <div className="flex flex-col">
-      <div
-        onDoubleClick={() => onOpen(node)}
-        onClick={() => {
-          if (isFolder) setOpenFolderId(isOpen ? null : node.id)
-        }}
-        className={`
-          group relative flex flex-col items-center justify-center gap-2.5
-          p-3 pt-4 rounded-xl border border-border-main
-          bg-surface hover:bg-hover-bg hover:border-border-strong/40
-          cursor-pointer transition-all duration-150 select-none
-          ${isOpen ? 'ring-2 ring-primary/20 border-primary/30 bg-primary/3' : ''}
-        `}
-        title={isFolder ? 'Nhấn để xem nội dung, nhấn đúp để mở' : 'Nhấn đúp để mở'}
-      >
-        {/* Icon */}
-        <div className="relative">
-          <FileTypeIcon type={node.type} url={node.url} size="lg" />
-          {isFolder && node.children.length > 0 && (
-            <span className="absolute -bottom-1 -right-1 text-[9px] font-bold bg-primary/10 text-primary rounded px-1">
-              {node.children.length}
-            </span>
-          )}
-        </div>
-
-        {/* Name */}
-        <span className="w-full text-center text-[11px] font-medium text-foreground leading-tight line-clamp-2 break-words">
-          {node.title}
-        </span>
-      </div>
-
-      {/* Folder expand: show children inline below */}
-      {isFolder && isOpen && node.children.length > 0 && (
-        <div className="mt-1 ml-2 pl-2 border-l-2 border-primary/20 flex flex-col gap-0.5">
-          {node.children.map(child => (
-            <div
-              key={child.id}
-              onDoubleClick={() => onOpen(child)}
-              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-hover-bg cursor-pointer transition-colors group"
-            >
-              <FileTypeIcon type={child.type} url={child.url} size="sm" />
-              <span className="text-[11px] text-foreground truncate flex-1">{child.title}</span>
-              <ArrowRight className="w-3 h-3 text-secondary/30 opacity-0 group-hover:opacity-100 shrink-0 transition-opacity" />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function LibraryGrid({
-  nodes,
-  onSelectNote,
-  onSelectCanvas,
-  onSelectLink,
-}: {
-  nodes: WorkspaceNode[]
-  onSelectNote: (id: string) => void
-  onSelectCanvas: (id: string) => void
-  onSelectLink: (id: string) => void
-}) {
-  const tree = useMemo(() => buildTree(nodes), [nodes])
-  const [openFolderId, setOpenFolderId] = useState<string | null>(null)
-
-  const handleOpen = (node: TreeNode) => {
-    if (node.type === 'note' && node.note_id) onSelectNote(node.note_id)
-    else if (node.type === 'map' && node.map_id) onSelectCanvas(node.map_id)
-    else if (node.type === 'link') onSelectLink(node.id)
-  }
-
-  if (tree.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
-        <FolderOpen className="w-10 h-10 text-secondary/20" strokeWidth={1.5} />
-        <div>
-          <p className="text-xs font-semibold text-secondary/60">Library trống</p>
-          <p className="text-[11px] text-secondary/40 mt-0.5">Tạo note, canvas hoặc thư mục từ thanh bên trái</p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2">
-      {tree.map(node => (
-        <FileCard
-          key={node.id}
-          node={node}
-          onOpen={handleOpen}
-          openFolderId={openFolderId}
-          setOpenFolderId={setOpenFolderId}
-        />
-      ))}
-    </div>
-  )
-}
-
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
-interface WorkspaceHomeProps {
-  nodes: WorkspaceNode[]
-  onSelectNote: (id: string) => void
-  onSelectCanvas: (id: string) => void
-  onSelectLink: (id: string) => void
-}
-
-export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onSelectLink }: WorkspaceHomeProps) {
+export default function WorkspaceHome() {
   const { navigate } = useClientNavigate()
   const { issues } = useContext(TasksContext)
 
@@ -447,7 +308,7 @@ export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onS
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto no-scrollbar">
-        <div className="max-w-3xl mx-auto w-full px-6 py-6 flex flex-col gap-6">
+        <div className="w-full px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-6">
 
           {/* Row 1: Bento Grid Metrics */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
@@ -569,26 +430,7 @@ export default function WorkspaceHome({ nodes, onSelectNote, onSelectCanvas, onS
             </div>
           </div>
 
-          {/* Row 3: Library (Folders & Files Grid) */}
-          <section className="py-2 border-t border-border-main pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Folder className="w-3.5 h-3.5 text-primary/70" />
-                <h2 className="text-xs font-bold uppercase tracking-wider text-secondary/70">
-                  Library
-                </h2>
-              </div>
-            </div>
-            <LibraryGrid
-              nodes={nodes}
-              onSelectNote={onSelectNote}
-              onSelectCanvas={onSelectCanvas}
-              onSelectLink={onSelectLink}
-            />
-          </section>
 
-          {/* Divider */}
-          <div className="border-t border-border-main" />
 
           {/* Row 4: Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

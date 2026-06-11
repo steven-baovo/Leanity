@@ -135,21 +135,7 @@ function WorkspaceView({ id, type }: { id: string | null; type: string }) {
 
   // Default: WorkspaceHome
   return (
-    <WorkspaceHome
-      nodes={nodes}
-      onSelectNote={(noteId) => {
-        window.history.pushState(null, '', `/note/${noteId}`)
-        window.dispatchEvent(new PopStateEvent('popstate'))
-      }}
-      onSelectCanvas={(mapId) => {
-        window.history.pushState(null, '', `/canvas/${mapId}`)
-        window.dispatchEvent(new PopStateEvent('popstate'))
-      }}
-      onSelectLink={(linkId) => {
-        window.history.pushState(null, '', `/link/${linkId}`)
-        window.dispatchEvent(new PopStateEvent('popstate'))
-      }}
-    />
+    <WorkspaceHome />
   )
 }
 
