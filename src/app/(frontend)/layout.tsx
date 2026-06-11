@@ -13,6 +13,8 @@ import SyncInitializer from "@/components/SyncInitializer"
 import MainSidebar from "@/components/sidebar/MainSidebar"
 import GlobalKeyboardListener from "@/components/GlobalKeyboardListener"
 import QuickCreateModal from "@/components/shared/QuickCreateModal"
+import { ShortcutsHelpProvider } from "@/contexts/ShortcutsHelpContext"
+import ShortcutsHelpModal from "@/components/shared/ShortcutsHelpModal"
 
 export default function FrontendLayout({
   children,
@@ -57,26 +59,29 @@ export default function FrontendLayout({
     <FocusProvider>
       <TasksProvider>
         <QuickCreateProvider>
-          <WorkspaceProvider>
-          {user && <SyncInitializer />}
-          {/* Global shortcuts */}
-          <GlobalKeyboardListener />
-          <QuickCreateModal />
-          <div className="flex flex-col lg:flex-row h-screen bg-[#fcfdfe] dark:bg-background overflow-hidden p-[5px] gap-[5px] lg:p-0 lg:gap-0">
-            {/* Mobile Navigation */}
-            <MobileNavigationWrapper user={user} />
+          <ShortcutsHelpProvider>
+            <WorkspaceProvider>
+            {user && <SyncInitializer />}
+            {/* Global shortcuts */}
+            <GlobalKeyboardListener />
+            <QuickCreateModal />
+            <ShortcutsHelpModal />
+            <div className="flex flex-col lg:flex-row h-screen bg-[#fcfdfe] dark:bg-background overflow-hidden p-[5px] gap-[5px] lg:p-0 lg:gap-0">
+              {/* Mobile Navigation */}
+              <MobileNavigationWrapper user={user} />
 
-            {/* Desktop Sidebar */}
-            <div className="hidden lg:block h-full">
-              <Suspense fallback={<div className="w-[240px] h-full bg-[#f8fafc] animate-pulse" />}>
-                <MainSidebar />
-              </Suspense>
+              {/* Desktop Sidebar */}
+              <div className="hidden lg:block h-full">
+                <Suspense fallback={<div className="w-[240px] h-full bg-[#f8fafc] animate-pulse" />}>
+                  <MainSidebar />
+                </Suspense>
+              </div>
+
+              {/* Main Content Island */}
+              <ContentWrapper>{children}</ContentWrapper>
             </div>
-
-            {/* Main Content Island */}
-            <ContentWrapper>{children}</ContentWrapper>
-          </div>
-          </WorkspaceProvider>
+            </WorkspaceProvider>
+          </ShortcutsHelpProvider>
         </QuickCreateProvider>
       </TasksProvider>
     </FocusProvider>

@@ -42,6 +42,18 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
     if (!selected) setIsEditing(false)
   }, [selected])
 
+  // Tắt draggable của node khi đang edit để không bị kéo khi bôi đen text
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === id) {
+          return { ...node, draggable: !isEditing }
+        }
+        return node
+      })
+    )
+  }, [isEditing, id, setNodes])
+
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (data.isLink && data.targetId) {
@@ -171,18 +183,16 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
             ref={textareaRef}
             readOnly={!isEditing || data.isLink}
             aria-label="Nội dung thẻ"
-            className={`w-full resize-none outline-none bg-transparent text-gray-800 text-sm leading-relaxed overflow-hidden ${(!isEditing || data.isLink) ? 'cursor-default select-none pointer-events-none' : 'cursor-text'}`}
+            className={`w-full resize-none outline-none bg-transparent text-gray-800 text-sm leading-relaxed overflow-hidden ${
+              isEditing && !data.isLink
+                ? 'cursor-text'
+                : 'cursor-default select-none pointer-events-none'
+            }`}
             value={data.label}
             onChange={onChange}
             onBlur={onBlur}
             placeholder={isEditing ? "Type something..." : ""}
             rows={1}
-            onPointerDownCapture={(e) => {
-              if (isEditing && !data.isLink) {
-                // Allow text selection inside the textarea only when editing
-                e.stopPropagation()
-              }
-            }}
           />
         </div>
       </div>
