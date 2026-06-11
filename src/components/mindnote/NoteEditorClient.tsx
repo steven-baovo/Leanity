@@ -243,13 +243,13 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
                 }
               }}
               placeholder="Untitled Note"
-              className="w-full text-3xl font-bold tracking-tight text-foreground border-none outline-none mb-4 placeholder:text-black/5 resize-none overflow-hidden"
+              className="w-full text-3xl font-bold tracking-tight text-foreground border-none outline-none mb-4 placeholder:text-secondary/30 resize-none overflow-hidden"
               rows={1}
             />
 
             {/* Editor — key={noteId} tạo instance Tiptap mới khi đổi file
                 initialContent={content} dùng state ổn định, KHÔNG phải note.content từ useLiveQuery */}
-            <div className="prose prose-lg max-w-none">
+            <div className="prose prose-lg max-w-none dark:prose-invert">
               <ZenEditor
                 noteId={noteId}
                 initialContent={content}

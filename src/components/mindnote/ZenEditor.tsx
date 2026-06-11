@@ -319,7 +319,7 @@ const ZenEditor = ({ noteId, initialContent, onChange, onCountChange, placeholde
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] pt-2 pb-24',
+        class: 'prose prose-lg max-w-none dark:prose-invert focus:outline-none min-h-[500px] pt-2 pb-24',
       },
       handleDOMEvents: {
         contextmenu: (view, event) => {
