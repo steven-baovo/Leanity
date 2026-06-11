@@ -165,6 +165,7 @@ export default function SettingsModal({
     usedKeys.add(currentShortcuts.workspace)
     usedKeys.add(currentShortcuts.graph)
     usedKeys.add(currentShortcuts.pomodoro)
+    usedKeys.add(currentShortcuts.projects)
     usedKeys.add(currentShortcuts.productivity)
     usedKeys.add(currentShortcuts.okrs)
     usedKeys.add(currentShortcuts.quickCreate)

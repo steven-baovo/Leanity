@@ -117,6 +117,9 @@ export default function GlobalKeyboardListener() {
           case currentShortcuts.pomodoro:
             navigate('/pomodoro');
             break;
+          case currentShortcuts.projects:
+            navigate('/projects');
+            break;
           case currentShortcuts.productivity:
             navigate('/productivity');
             break;

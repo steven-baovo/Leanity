@@ -13,7 +13,8 @@ export interface ShortcutConfig {
   tasks: string;         // default: 't' (sequence after prefix)
   workspace: string;     // default: 'w' (sequence after prefix)
   graph: string;         // default: 'g' (sequence after prefix)
-  pomodoro: string;      // default: 'p' (sequence after prefix)
+  pomodoro: string;      // default: 'f' (sequence after prefix)
+  projects: string;      // default: 'p' (sequence after prefix)
   productivity: string;  // default: 'r' (sequence after prefix)
   okrs: string;          // default: 'o' (sequence after prefix)
   quickCreate: string;   // default: 'c' (single key)
@@ -26,7 +27,8 @@ export const DEFAULT_SHORTCUTS: ShortcutConfig = {
   tasks: 't',
   workspace: 'w',
   graph: 'g',
-  pomodoro: 'p',
+  pomodoro: 'f',
+  projects: 'p',
   productivity: 'r',
   okrs: 'o',
   quickCreate: 'c',
@@ -67,6 +69,7 @@ export const SHORTCUT_ACTIONS_METADATA = [
       { id: 'workspace', name: 'Workspace (Library)', isSequence: true },
       { id: 'graph', name: 'Graph View', isSequence: true },
       { id: 'pomodoro', name: 'Pomodoro Focus', isSequence: true },
+      { id: 'projects', name: 'Dự án', isSequence: true },
       { id: 'productivity', name: 'Báo cáo năng suất', isSequence: true },
       { id: 'okrs', name: 'OKRs', isSequence: true },
     ]
