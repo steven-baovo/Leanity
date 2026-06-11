@@ -17,11 +17,9 @@ import {
   Zap,
   Calendar,
   Timer,
-  CheckSquare,
   Activity,
   TrendingUp,
   Award,
-  Briefcase,
 } from 'lucide-react'
 
 // ─── Eisenhower Matrix Logic ──────────────────────────────────────────────────
@@ -359,52 +357,7 @@ export default function WorkspaceHome() {
       <div className="flex-1 overflow-y-auto no-scrollbar">
         <div className="w-full px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-6">
 
-          {/* Row 1: Bento Grid Metrics */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
-            {/* Metric 1: Total time */}
-            <div className="p-4 bg-surface border border-border-main rounded-default shadow-subtle flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-secondary font-medium tracking-tight uppercase">Tổng thời gian</p>
-                <h3 className="text-sm sm:text-base font-black text-foreground truncate mt-0.5">{stats.focusTimeStr}</h3>
-              </div>
-            </div>
 
-            {/* Metric 2: Pomodoros */}
-            <div className="p-4 bg-surface border border-border-main rounded-default shadow-subtle flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
-                <Timer className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-secondary font-medium tracking-tight uppercase">Pomodoro</p>
-                <h3 className="text-sm sm:text-base font-black text-foreground truncate mt-0.5">{stats.pomodorosCount} phiên</h3>
-              </div>
-            </div>
-
-            {/* Metric 3: Completed */}
-            <div className="p-4 bg-surface border border-border-main rounded-default shadow-subtle flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
-                <CheckSquare className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-secondary font-medium tracking-tight uppercase">Đã hoàn thành</p>
-                <h3 className="text-sm sm:text-base font-black text-foreground truncate mt-0.5">{stats.completedIssuesCount} task</h3>
-              </div>
-            </div>
-
-            {/* Metric 4: Pending */}
-            <div className="p-4 bg-surface border border-border-main rounded-default shadow-subtle flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
-                <Briefcase className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-secondary font-medium tracking-tight uppercase">Đang xử lý</p>
-                <h3 className="text-sm sm:text-base font-black text-foreground truncate mt-0.5">{stats.pendingIssuesCount} task</h3>
-              </div>
-            </div>
-          </div>
 
           {/* Row 2: Today's Tasks & Highest Priority Tasks */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
