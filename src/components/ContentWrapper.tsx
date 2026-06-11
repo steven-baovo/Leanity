@@ -1,15 +1,15 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { useAppRouter } from '@/contexts/AppRouterContext'
 
 export default function ContentWrapper({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
+  const { route } = useAppRouter()
   
   // Fixed pages (iframes, canvas boards, graphs, pomodoro) must never scroll at the page level
-  const isFixedPage = pathname?.startsWith('/link') || 
-                      pathname?.startsWith('/canvas') || 
-                      pathname?.startsWith('/graph') || 
-                      pathname?.startsWith('/pomodoro')
+  const isFixedPage = route.type === 'link' || 
+                      route.type === 'canvas' || 
+                      route.type === 'graph' || 
+                      route.type === 'pomodoro'
   
   return (
     <div className={`flex-1 flex flex-col h-full overflow-hidden relative bg-surface border border-border-main lg:rounded-none lg:border-y-0 lg:border-r-0 lg:border-l`}>

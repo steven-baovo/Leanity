@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ListTodo, FileText, Timer, Menu } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useAppRouter } from '@/contexts/AppRouterContext'
 import { motion } from 'framer-motion'
 import { useFocus } from '@/contexts/FocusContext'
 
@@ -18,7 +18,7 @@ interface MobileNavbarProps {
 }
 
 export default function MobileNavbar({ onMenuClick }: MobileNavbarProps) {
-  const pathname = usePathname()
+  const { route } = useAppRouter()
   const focus = useFocus()
   const [workspaceHref, setWorkspaceHref] = useState('/workspace')
 
@@ -33,8 +33,18 @@ export default function MobileNavbar({ onMenuClick }: MobileNavbarProps) {
         {NAV_ITEMS.map((item) => {
           const isWorkspace = item.label === 'Workspace'
           const targetHref = isWorkspace ? workspaceHref : item.href
-        const isActive = item.prefixes.some(prefix => pathname?.startsWith(prefix))
+          
+          let isActive = false
+          if (item.label === 'Tasks') {
+            isActive = ['tasks', 'task', 'project', 'projects', 'cycle', 'cycles'].includes(route.type)
+          } else if (item.label === 'Workspace') {
+            isActive = ['workspace', 'note', 'canvas', 'link', 'graph'].includes(route.type)
+          } else if (item.label === 'Focus') {
+            isActive = ['pomodoro'].includes(route.type)
+          }
+
           const Icon = item.icon
+
           const isFocus = item.label === 'Focus'
 
           return (

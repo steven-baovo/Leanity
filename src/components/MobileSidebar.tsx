@@ -11,7 +11,7 @@ import {
   ListTodo
 } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useAppRouter } from '@/contexts/AppRouterContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import UserMenu from './UserMenu'
 
@@ -31,7 +31,7 @@ const MENU_ITEMS = [
 
 
 export default function MobileSidebar({ isOpen, onClose, user, profile }: MobileSidebarProps) {
-  const pathname = usePathname()
+  const { route } = useAppRouter()
   const [workspaceHref, setWorkspaceHref] = useState('/workspace')
   const [isMounted, setIsMounted] = useState(false)
 
@@ -88,7 +88,16 @@ export default function MobileSidebar({ isOpen, onClose, user, profile }: Mobile
                 {MENU_ITEMS.map((item) => {
                   const Icon = item.icon
                   const isWorkspace = item.title === 'Workspace'
-                  const isActive = isWorkspace ? pathname.startsWith('/workspace') : pathname === item.href
+                  
+                  let isActive = false
+                  if (item.title === 'Nhiệm vụ') {
+                    isActive = ['tasks', 'task', 'project', 'projects', 'cycle', 'cycles'].includes(route.type)
+                  } else if (item.title === 'Workspace') {
+                    isActive = ['workspace', 'note', 'canvas', 'link', 'graph'].includes(route.type)
+                  } else if (item.title === 'MindFocus') {
+                    isActive = ['pomodoro'].includes(route.type)
+                  }
+
                   const finalHref = isWorkspace ? workspaceHref : item.href
                   return (
                     <Link
@@ -98,6 +107,7 @@ export default function MobileSidebar({ isOpen, onClose, user, profile }: Mobile
                       onClick={onClose}
                       className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all ${isActive ? 'bg-primary/5 text-primary font-bold' : 'text-secondary hover:bg-gray-50'}`}
                     >
+
                       <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-secondary'}`} />
                       <span className="text-sm">{item.title}</span>
                     </Link>
