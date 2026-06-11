@@ -46,8 +46,8 @@ export default function LinkEmbedPreview({ nodeId, nodes }: { nodeId: string; no
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-background">
-      <div className="flex-1 relative flex flex-col h-full min-h-0">
+    <div className="absolute inset-0 flex flex-col bg-background">
+      <div className="flex-1 relative flex flex-col min-h-0">
         {!formattedUrl ? (
           <div className="flex-1 m-4 p-6 bg-surface border border-border-main rounded-2xl flex flex-col items-center justify-center text-center">
             <LucideLink className="w-10 h-10 text-secondary/30 mb-2 animate-bounce" />
@@ -63,7 +63,10 @@ export default function LinkEmbedPreview({ nodeId, nodes }: { nodeId: string; no
             <p className="text-xs text-secondary/40 max-w-xs">Xác minh khả năng hiển thị trực tiếp để mang lại trải nghiệm tối ưu.</p>
           </div>
         ) : (isEmbeddable || forceEmbed) ? (
-          <div className="flex-1 bg-surface overflow-hidden flex flex-col relative h-full w-full">
+          <div
+            className="flex-1 bg-surface overflow-hidden flex flex-col relative"
+            style={{ overscrollBehavior: 'contain' }}
+          >
             <div className="absolute top-3 right-3 z-50 flex items-center gap-1.5">
               <button
                 onClick={handleRefresh}
@@ -88,9 +91,10 @@ export default function LinkEmbedPreview({ nodeId, nodes }: { nodeId: string; no
             <iframe
               key={iframeKey}
               src={formattedUrl}
-              className="flex-1 w-full h-full border-none bg-surface"
+              className="flex-1 w-full border-none bg-surface block"
               sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
               title={node.title}
+              style={{ overscrollBehavior: 'contain' }}
             />
           </div>
         ) : (

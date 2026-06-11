@@ -13,8 +13,15 @@ export default function ContentWrapper({ children }: { children: React.ReactNode
   
   return (
     <div className={`flex-1 flex flex-col h-full overflow-hidden relative bg-surface border border-border-main lg:rounded-none lg:border-y-0 lg:border-r-0 lg:border-l`}>
-      <main className={`flex-1 min-w-0 relative ${isFixedPage ? 'overflow-hidden' : 'overflow-y-auto no-scrollbar'}`}>
-        <div className="w-full h-full">
+      <main
+        className={`flex-1 min-w-0 min-h-0 h-full relative ${
+          isFixedPage
+            ? 'overflow-hidden'
+            : 'overflow-y-auto no-scrollbar'
+        }`}
+        style={isFixedPage ? { overscrollBehavior: 'none' } : undefined}
+      >
+        <div className={`w-full ${ isFixedPage ? 'h-full' : 'min-h-full' }`}>
           {children}
         </div>
       </main>
