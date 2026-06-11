@@ -76,7 +76,6 @@ export default function CycleList() {
         {/* Dòng 1: Tiêu đề chính */}
         <div className="flex items-center justify-between px-4 h-[44px] border-b border-border-main shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <CheckSquare className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
             <h1 className="text-standard tracking-tight font-medium text-standard-text truncate leading-none">Task Center</h1>
           </div>
         </div>

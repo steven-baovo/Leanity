@@ -109,7 +109,15 @@ export default function TasksSection() {
     return c.endDate < nowStr;
   }).sort((a, b) => b.startDate.localeCompare(a.startDate));
 
-  const isMyTasksActive = isClient && route.type === 'tasks';
+  const isMyTasksActive = isClient && [
+    'tasks',
+    'task',
+    'projects',
+    'project',
+    'cycles',
+    'cycle',
+    'okrs'
+  ].includes(route.type);
 
   return (
     <>
@@ -127,7 +135,6 @@ export default function TasksSection() {
               <CheckSquare className="w-3.5 h-3.5 text-zinc-400/80" />
               <span>Task Center</span>
             </div>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-200/50 dark:bg-zinc-800/50 text-secondary">{(dbIssues || []).length}</span>
           </div>
         </div>
       </div>

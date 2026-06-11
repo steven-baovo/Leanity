@@ -5,9 +5,15 @@ import { usePathname } from 'next/navigation'
 export default function ContentWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   
+  // Fixed pages (iframes, canvas boards, graphs, pomodoro) must never scroll at the page level
+  const isFixedPage = pathname?.startsWith('/link') || 
+                      pathname?.startsWith('/canvas') || 
+                      pathname?.startsWith('/graph') || 
+                      pathname?.startsWith('/pomodoro')
+  
   return (
     <div className={`flex-1 flex flex-col h-full overflow-hidden relative bg-surface border border-border-main lg:rounded-none lg:border-y-0 lg:border-r-0 lg:border-l`}>
-      <main className="flex-1 min-w-0 overflow-y-auto no-scrollbar relative">
+      <main className={`flex-1 min-w-0 relative ${isFixedPage ? 'overflow-hidden' : 'overflow-y-auto no-scrollbar'}`}>
         <div className="w-full h-full">
           {children}
         </div>
