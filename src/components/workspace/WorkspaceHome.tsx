@@ -362,7 +362,7 @@ export default function WorkspaceHome() {
           {/* Row 2: Today's Tasks & Highest Priority Tasks */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Panel 1: Today's Tasks */}
-            <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 shadow-subtle hover:shadow-hover transition-all duration-200">
+            <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 transition-all duration-200">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
                 <Calendar className="w-4 h-4 text-blue-500" strokeWidth={2} />
                 <h3 className="text-xs font-semibold text-foreground tracking-tight">Nhiệm vụ hôm nay</h3>
@@ -397,7 +397,7 @@ export default function WorkspaceHome() {
             </div>
 
             {/* Panel 2: Highest Priority Tasks */}
-            <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 shadow-subtle hover:shadow-hover transition-all duration-200">
+            <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 transition-all duration-200">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
                 <Zap className="w-4 h-4 text-amber-500" strokeWidth={2} />
                 <h3 className="text-xs font-semibold text-foreground tracking-tight">Ưu tiên cao nhất</h3>
@@ -437,7 +437,7 @@ export default function WorkspaceHome() {
           {/* Row 4: Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Bar Chart Completed Tasks Trend (Col-span: 2) */}
-            <div className="lg:col-span-2 p-5 bg-surface border border-border-main rounded-default shadow-subtle flex flex-col min-h-[300px]">
+            <div className="lg:col-span-2 p-5 bg-surface border border-border-main rounded-default flex flex-col min-h-[300px]">
               <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-primary" />
@@ -500,7 +500,7 @@ export default function WorkspaceHome() {
             </div>
 
             {/* Time Allocation Pie Chart (Col-span: 1) */}
-            <div className="p-5 bg-surface border border-border-main rounded-default shadow-subtle flex flex-col items-center justify-between min-h-[300px]">
+            <div className="p-5 bg-surface border border-border-main rounded-default flex flex-col items-center justify-between min-h-[300px]">
               <div className="w-full flex items-center gap-2 mb-4 self-start">
                 <Activity className="w-4 h-4 text-emerald-500" />
                 <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight">Phân bổ hoạt động</h2>
@@ -551,7 +551,7 @@ export default function WorkspaceHome() {
           {/* History & Lists Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">
             {/* Completed Tasks List */}
-            <div className="p-5 bg-surface border border-border-main rounded-default shadow-subtle flex flex-col min-h-[250px]">
+            <div className="p-5 bg-surface border border-border-main rounded-default flex flex-col min-h-[250px]">
               <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight mb-4 flex items-center gap-2">
                 <Award className="w-4 h-4 text-indigo-500" />
                 <span>Nhiệm vụ hoàn thành gần đây</span>
@@ -579,7 +579,7 @@ export default function WorkspaceHome() {
             </div>
 
             {/* Focus History List */}
-            <div className="p-5 bg-surface border border-border-main rounded-default shadow-subtle flex flex-col min-h-[250px]">
+            <div className="p-5 bg-surface border border-border-main rounded-default flex flex-col min-h-[250px]">
               <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight mb-4 flex items-center gap-2">
                 <Timer className="w-4 h-4 text-amber-500" />
                 <span>Lịch sử tập trung gần đây</span>
