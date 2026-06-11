@@ -453,7 +453,7 @@ export default function WorkspaceSection() {
         >
           <div className="flex items-center gap-2">
             <Library className="w-3.5 h-3.5 text-zinc-400/80" strokeWidth={2} />
-            <span className="font-medium text-[13px] text-secondary">Library</span>
+            <span className="font-semibold text-[12px] text-secondary">Library</span>
           </div>
           
           <div className="flex items-center gap-1">

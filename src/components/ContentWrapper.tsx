@@ -13,6 +13,7 @@ export default function ContentWrapper({ children }: { children: React.ReactNode
   
   // Fixed pages (iframes, canvas boards, graphs, pomodoro) must never scroll at the page level
   const isFixedPage = mounted && (
+                      route.type === 'note' || 
                       route.type === 'link' || 
                       route.type === 'canvas' || 
                       route.type === 'graph' || 

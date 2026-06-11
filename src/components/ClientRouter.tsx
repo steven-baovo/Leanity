@@ -63,7 +63,7 @@ function WorkspaceView({ id, type }: { id: string | null; type: string }) {
 
   if (type === 'note' && id) {
     return (
-      <div className="w-full h-full relative overflow-auto no-scrollbar">
+      <div className="w-full h-full relative overflow-hidden no-scrollbar">
         <NoteEditorClient
           key={id}
           noteId={id}

@@ -133,7 +133,7 @@ export default function TasksSection() {
           >
             <div className="flex items-center gap-2">
               <CheckSquare className="w-3.5 h-3.5 text-zinc-400/80" />
-              <span>Task Center</span>
+              <span className={`text-[12px] ${isMyTasksActive ? 'font-semibold' : 'font-medium'}`}>Task Center</span>
             </div>
           </div>
         </div>
