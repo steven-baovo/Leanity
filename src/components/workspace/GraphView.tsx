@@ -49,34 +49,35 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
 
-  // Hàm cấu hình lực vật lý D3 - dùng chung cho callback ref và useEffect
-  const applyForces = useCallback((instance: any) => {
+  // Cấu hình các lực D3 — theo kiến trúc Obsidian:
+  // Lực đẩy mạnh (charge) = cơ chế spacing chính, KHÔNG phải forceCollide
+  // forceCollide chỉ dùng để ngăn dot-on-dot overlap
+  const configureForces = useCallback((instance: any) => {
     if (!instance) return
 
-    // Lực đẩy vừa phải: node đẩy nhau ra nhưng không quá mạnh
+    // Lực đẩy mạnh: cơ chế tạo khoảng cách tự nhiên giữa các node
+    // Tương đương "Repel force" slider của Obsidian ở mức cao
     const chargeForce = instance.d3Force('charge')
-    if (chargeForce) chargeForce.strength(-40)
+    if (chargeForce) chargeForce.strength(-150)
 
-    // Link ngắn: node liên kết tụ sát nhau
+    // Khoảng cách link vừa phải: các node có kết nối tụ thành cluster
     const linkForce = instance.d3Force('link')
-    if (linkForce) linkForce.distance(35)
+    if (linkForce) linkForce.distance(60)
 
-    // Collision: đủ để text không đè lên nhau (khoảng cách ~30px giữa 2 node)
-    instance.d3Force('collide', forceCollide(30))
+    // Collision CỰC NHỎ: chỉ ngăn dot chồng lên nhau (r=3 + 5 buffer)
+    // Text label KHÔNG được dùng ở đây vì chúng vẽ ở screen space, không graph space
+    instance.d3Force('collide', forceCollide(8))
 
-    // Lực hấp dẫn về trung tâm: kéo node rời rạc vào gần (như Obsidian)
-    // strength 0.08 = nhẹ nhàng, không override lực link
-    instance.d3Force('gravX', forceX(0).strength(0.08))
-    instance.d3Force('gravY', forceY(0).strength(0.08))
-
-    instance.d3ReheatSimulation()
+    // Lực hấp dẫn nhẹ về trung tâm: giữ node rời rạc không trôi ra ngoài viewport
+    instance.d3Force('gravX', forceX(0).strength(0.05))
+    instance.d3Force('gravY', forceY(0).strength(0.05))
   }, [])
 
-  // Callback ref: cấu hình forces ngay khi ForceGraph2D được mount vào DOM
+  // Callback ref: cấu hình forces ngay khi component mount (trước warmupTicks)
   const setGraphRef = useCallback((instance: any) => {
     graphRef.current = instance
-    applyForces(instance)
-  }, [applyForces])
+    configureForces(instance)
+  }, [configureForces])
 
   // Đo đạc kích thước thực tế của parent container bằng ResizeObserver để tránh tràn màn hình sang phải
   useEffect(() => {
@@ -203,10 +204,13 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
     }
   }, [nodes])
 
-  // Áp dụng lại các lực khi graphData thay đổi (nodes/edges mới)
+  // Khi dữ liệu thay đổi: cấu hình lại lực và hâm nóng simulation
   useEffect(() => {
-    applyForces(graphRef.current)
-  }, [graphData, applyForces])
+    const instance = graphRef.current
+    if (!instance) return
+    configureForces(instance)
+    instance.d3ReheatSimulation()
+  }, [graphData, configureForces])
 
   return (
     <div ref={containerRef} className="w-full h-full bg-background relative">
@@ -259,8 +263,10 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
             ctx.fillStyle = color;
             ctx.fill();
             
-            // Vẽ tên nốt ở dưới (Chỉ hiện khi zoom đủ lớn để không bị rối)
-            if (globalScale > 0.6) {
+            // Chỉ hiện label khi zoom ĐỦ GẦN (globalScale >= 1.0)
+            // Giống Obsidian: zoom xa = chỉ thấy dot, zoom gần = thấy text
+            // Đây là cách đúng để tránh text overlap ở overview
+            if (globalScale >= 1.0) {
               ctx.save();
               const m = ctx.getTransform?.();
               
@@ -345,11 +351,16 @@ export default function GraphView({ nodes, loading }: GraphViewProps) {
               navigate(`/link/${node.id}`)
             }
           }}
-          d3VelocityDecay={0.4}
-          // Sau khi simulation ổn định → tự zoom vừa khung hình (như Obsidian)
+          // warmupTicks: pre-run 150 iterations TRƯỚC khi render frame đầu tiên
+          // → nodes đã ở vị trí tốt ngay từ đầu, không bị "nhảy" lộn xộn
+          warmupTicks={150}
+          // alphaDecay thấp hơn: simulation nguội chậm hơn = layout tốt hơn
+          d3AlphaDecay={0.015}
+          d3VelocityDecay={0.3}
+          // Sau khi simulation ổn định → auto zoom vừa khung hình
           onEngineStop={() => {
             if (graphRef.current) {
-              graphRef.current.zoomToFit(400, 60)
+              graphRef.current.zoomToFit(400, 50)
             }
           }}
         />
