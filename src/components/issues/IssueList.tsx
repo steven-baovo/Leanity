@@ -80,7 +80,7 @@ interface IssueListProps {
 export default function IssueList({ 
   projectId = null, 
   cycleId = null, 
-  title = 'My tasks', 
+  title = 'Task Center', 
   hideHeader = false,
   hideTitle = false,
   disableScroll = false
@@ -232,39 +232,13 @@ export default function IssueList({
       
       {!hideHeader && (
         <header className="flex flex-col bg-background shrink-0 select-none">
-          {/* Dòng 1: Tiêu đề hoặc Segmented Tabs */}
+          {/* Dòng 1: Tiêu đề chính */}
           {!hideTitle && (
-            <div className="flex items-stretch justify-between px-4 h-[44px] border-b border-border-main shrink-0">
+            <div className="flex items-center justify-between px-4 h-[44px] border-b border-border-main shrink-0">
               {!projectId && !cycleId ? (
-                <div className="flex items-stretch gap-6 h-full text-xs select-none">
-                  <button
-                    onClick={() => navigate('/tasks')}
-                    className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-zinc-900 dark:border-zinc-100 text-foreground font-semibold"
-                  >
-                    <CheckSquare className="w-3.5 h-3.5" />
-                    <span>Tasks</span>
-                  </button>
-                  <button
-                    onClick={() => navigate('/projects')}
-                    className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-transparent text-zinc-400 dark:text-zinc-500 hover:text-foreground hover:border-zinc-300 dark:hover:border-zinc-700"
-                  >
-                    <Box className="w-3.5 h-3.5" />
-                    <span>Project</span>
-                  </button>
-                  <button
-                    onClick={() => navigate('/okrs')}
-                    className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-transparent text-zinc-400 dark:text-zinc-500 hover:text-foreground hover:border-zinc-300 dark:hover:border-zinc-700"
-                  >
-                    <Target className="w-3.5 h-3.5" />
-                    <span>OKRs</span>
-                  </button>
-                  <button
-                    onClick={() => navigate('/cycles')}
-                    className="h-full flex items-center gap-1.5 px-1 border-b-2 -mb-[1px] text-[12px] transition-all cursor-pointer border-transparent text-zinc-400 dark:text-zinc-500 hover:text-foreground hover:border-zinc-300 dark:hover:border-zinc-700"
-                  >
-                    <Activity className="w-3.5 h-3.5" />
-                    <span>Cycle</span>
-                  </button>
+                <div className="flex items-center gap-2 min-w-0">
+                  <CheckSquare className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                  <h1 className="text-standard tracking-tight font-medium text-standard-text truncate leading-none">Task Center</h1>
                 </div>
               ) : title ? (
                 <div className="flex items-center h-full">
@@ -276,64 +250,101 @@ export default function IssueList({
 
           {/* Dòng 2: Các thanh công cụ dồn 1 hàng */}
           <div className="flex items-center justify-between gap-4 flex-wrap p-4">
-            {/* Nhóm bên trái: Tìm kiếm + Lọc ưu tiên */}
-            <div className="flex items-center gap-2 text-xs flex-1 min-w-[240px]">
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-hover-bg rounded-md w-full max-w-[240px] border border-transparent focus-within:border-border-strong transition-colors">
-                <Search className="w-3.5 h-3.5 text-zinc-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Tìm tiêu đề, ID..."
-                  className="w-full bg-transparent outline-none text-xs text-foreground placeholder:text-zinc-500"
-                />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery('')}>
-                    <X className="w-3.5 h-3.5 text-zinc-400 hover:text-foreground" />
+            {/* Nhóm bên trái: Điều hướng phân đoạn (Segmented Tabs) */}
+            {!projectId && !cycleId && (
+              <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-border-main p-1 rounded-lg text-xs select-none">
+                <button
+                  onClick={() => navigate('/tasks')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-foreground rounded-md text-[11px] font-semibold transition-all cursor-pointer border border-transparent"
+                >
+                  <CheckSquare className="w-3.5 h-3.5" />
+                  <span>Tasks</span>
+                </button>
+                <button
+                  onClick={() => navigate('/projects')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground dark:hover:text-foreground rounded-md text-[11px] font-medium transition-all cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/40 border border-transparent"
+                >
+                  <Box className="w-3.5 h-3.5" />
+                  <span>Project</span>
+                </button>
+                <button
+                  onClick={() => navigate('/okrs')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground dark:hover:text-foreground rounded-md text-[11px] font-medium transition-all cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/40 border border-transparent"
+                >
+                  <Target className="w-3.5 h-3.5" />
+                  <span>OKRs</span>
+                </button>
+                <button
+                  onClick={() => navigate('/cycles')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-500 dark:text-zinc-400 hover:text-foreground dark:hover:text-foreground rounded-md text-[11px] font-medium transition-all cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/40 border border-transparent"
+                >
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>Cycle</span>
+                </button>
+              </div>
+            )}
+
+            {/* Nhóm bên phải: Tìm kiếm + Lọc ưu tiên + Tạo nhiệm vụ + Chuyển đổi View */}
+            <div className="flex items-center gap-4 flex-wrap ml-auto">
+              {/* Tìm kiếm + Lọc ưu tiên */}
+              <div className="flex items-center gap-2 text-xs">
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-hover-bg rounded-md w-full max-w-[240px] border border-transparent focus-within:border-border-strong transition-colors">
+                  <Search className="w-3.5 h-3.5 text-zinc-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Tìm tiêu đề, ID..."
+                    className="w-full bg-transparent outline-none text-xs text-foreground placeholder:text-zinc-500"
+                  />
+                  {searchQuery && (
+                    <button onClick={() => setSearchQuery('')}>
+                      <X className="w-3.5 h-3.5 text-zinc-400 hover:text-foreground" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <select
+                    value={filterPriority || ''}
+                    onChange={e => setFilterPriority(e.target.value || null)}
+                    className="appearance-none pr-7 pl-2.5 py-1.5 bg-surface border border-border-main rounded-md text-xs text-zinc-500 focus:outline-none focus:border-border-strong cursor-pointer hover:bg-hover-bg/30"
+                  >
+                    <option value="">Lọc ưu tiên</option>
+                    <option value="urgent">Khẩn cấp</option>
+                    <option value="high">Cao</option>
+                    <option value="medium">Vừa</option>
+                    <option value="low">Thấp</option>
+                    <option value="none">Không ưu tiên</option>
+                  </select>
+                  <ChevronDown className="w-3 h-3 text-zinc-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Tạo nhiệm vụ + Chuyển đổi View */}
+              <div className="flex items-center gap-3 shrink-0">
+                <button
+                  onClick={openQuickEntry}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-[11px] font-semibold rounded-md shadow-subtle transition-colors cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Task</span>
+                </button>
+
+                <div className="flex items-center gap-1 p-0.5 bg-hover-bg rounded-md">
+                  <button
+                    onClick={() => setView('list')}
+                    className={`p-1.5 rounded-sm transition-all cursor-pointer ${view === 'list' ? 'bg-surface text-foreground shadow-subtle' : 'text-zinc-400 hover:text-foreground'}`}
+                  >
+                    <List className="w-3.5 h-3.5" />
                   </button>
-                )}
-              </div>
-
-              <div className="relative">
-                <select
-                  value={filterPriority || ''}
-                  onChange={e => setFilterPriority(e.target.value || null)}
-                  className="appearance-none pr-7 pl-2.5 py-1.5 bg-surface border border-border-main rounded-md text-xs text-zinc-500 focus:outline-none focus:border-border-strong cursor-pointer hover:bg-hover-bg/30"
-                >
-                  <option value="">Lọc ưu tiên</option>
-                  <option value="urgent">Khẩn cấp</option>
-                  <option value="high">Cao</option>
-                  <option value="medium">Vừa</option>
-                  <option value="low">Thấp</option>
-                  <option value="none">Không ưu tiên</option>
-                </select>
-                <ChevronDown className="w-3 h-3 text-zinc-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-            </div>
-
-            {/* Nhóm bên phải: Tạo nhiệm vụ + Chuyển đổi View */}
-            <div className="flex items-center gap-3 shrink-0">
-              <button
-                onClick={openQuickEntry}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-[11px] font-semibold rounded-md shadow-subtle transition-colors cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Task</span>
-              </button>
-
-              <div className="flex items-center gap-1 p-0.5 bg-hover-bg rounded-md">
-                <button
-                  onClick={() => setView('list')}
-                  className={`p-1.5 rounded-sm transition-all cursor-pointer ${view === 'list' ? 'bg-surface text-foreground shadow-subtle' : 'text-zinc-400 hover:text-foreground'}`}
-                >
-                  <List className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => setView('board')}
-                  className={`p-1.5 rounded-sm transition-all cursor-pointer ${view === 'board' ? 'bg-surface text-foreground shadow-subtle' : 'text-zinc-400 hover:text-foreground'}`}
-                >
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                </button>
+                  <button
+                    onClick={() => setView('board')}
+                    className={`p-1.5 rounded-sm transition-all cursor-pointer ${view === 'board' ? 'bg-surface text-foreground shadow-subtle' : 'text-zinc-400 hover:text-foreground'}`}
+                  >
+                    <LayoutGrid className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>

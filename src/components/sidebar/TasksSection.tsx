@@ -125,7 +125,7 @@ export default function TasksSection() {
           >
             <div className="flex items-center gap-2">
               <CheckSquare className="w-3.5 h-3.5 text-zinc-400/80" />
-              <span>My tasks</span>
+              <span>Task Center</span>
             </div>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-200/50 dark:bg-zinc-800/50 text-secondary">{(dbIssues || []).length}</span>
           </div>
