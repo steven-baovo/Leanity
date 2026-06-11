@@ -438,10 +438,10 @@ export default function WorkspaceHome() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Bar Chart Completed Tasks Trend (Col-span: 2) */}
             <div className="lg:col-span-2 p-5 bg-surface border border-border-main rounded-default flex flex-col min-h-[300px]">
-              <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-border-main/50 gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-primary" />
-                  <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight">Xu hướng hoàn thành task</h2>
+                  <TrendingUp className="w-4 h-4 text-primary" strokeWidth={2} />
+                  <h3 className="text-xs font-semibold text-foreground tracking-tight">Xu hướng hoàn thành task</h3>
                 </div>
                 
                 <div className="flex items-center gap-3 ml-auto">
@@ -501,9 +501,9 @@ export default function WorkspaceHome() {
 
             {/* Time Allocation Pie Chart (Col-span: 1) */}
             <div className="p-5 bg-surface border border-border-main rounded-default flex flex-col items-center justify-between min-h-[300px]">
-              <div className="w-full flex items-center gap-2 mb-4 self-start">
-                <Activity className="w-4 h-4 text-emerald-500" />
-                <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight">Phân bổ hoạt động</h2>
+              <div className="w-full flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50 self-start">
+                <Activity className="w-4 h-4 text-emerald-500" strokeWidth={2} />
+                <h3 className="text-xs font-semibold text-foreground tracking-tight">Phân bổ hoạt động</h3>
               </div>
 
               <div className="relative w-36 h-36 flex items-center justify-center my-2">
@@ -552,10 +552,10 @@ export default function WorkspaceHome() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">
             {/* Completed Tasks List */}
             <div className="p-5 bg-surface border border-border-main rounded-default flex flex-col min-h-[250px]">
-              <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight mb-4 flex items-center gap-2">
-                <Award className="w-4 h-4 text-indigo-500" />
-                <span>Nhiệm vụ hoàn thành gần đây</span>
-              </h2>
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
+                <Award className="w-4 h-4 text-indigo-500" strokeWidth={2} />
+                <h3 className="text-xs font-semibold text-foreground tracking-tight">Nhiệm vụ hoàn thành gần đây</h3>
+              </div>
 
               <div className="flex-1 space-y-3">
                 {recentlyCompletedTasks.length === 0 ? (
@@ -580,10 +580,10 @@ export default function WorkspaceHome() {
 
             {/* Focus History List */}
             <div className="p-5 bg-surface border border-border-main rounded-default flex flex-col min-h-[250px]">
-              <h2 className="text-[13px] font-black text-foreground uppercase tracking-tight mb-4 flex items-center gap-2">
-                <Timer className="w-4 h-4 text-amber-500" />
-                <span>Lịch sử tập trung gần đây</span>
-              </h2>
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
+                <Timer className="w-4 h-4 text-amber-500" strokeWidth={2} />
+                <h3 className="text-xs font-semibold text-foreground tracking-tight">Lịch sử tập trung gần đây</h3>
+              </div>
 
               <div className="flex-1 space-y-3">
                 {recentSessions.length === 0 ? (
