@@ -954,7 +954,7 @@ export default function MindmapBoard({
   }
 
   return (
-    <div className="w-full h-full bg-white flex flex-col relative">
+    <div className="w-full h-full bg-[#fcfdfe] dark:bg-background flex flex-col relative">
       {/* Header Strip */}
       <header className="w-full flex items-center justify-between px-4 h-[44px] border-b border-border-main bg-background shrink-0 select-none z-10">
         <div className="flex items-center gap-1.5 text-standard tracking-tight text-secondary leading-none">
@@ -1022,7 +1022,7 @@ export default function MindmapBoard({
           selectionMode={SelectionMode.Partial}
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
           zoomOnDoubleClick={false}
-          className="bg-white"
+          className="bg-transparent"
           minZoom={0.2}
           maxZoom={4}
           proOptions={{ hideAttribution: true }} // Hide watermark for clean UI
@@ -1196,7 +1196,7 @@ export default function MindmapBoard({
               bottom: 0;
             }
           ` }} />
-          <Background variant={BackgroundVariant.Dots} gap={16} size={1.2} color="#cbd5e1" />
+          <Background variant={BackgroundVariant.Dots} gap={16} size={1.2} color="var(--mindmap-grid-color)" />
 
 
 
@@ -1344,21 +1344,21 @@ export default function MindmapBoard({
         </ReactFlow>
         
         {isConnectModalOpen && (
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100] flex items-center justify-center">
-            <div className="bg-white rounded-xl border border-gray-300 p-6 w-96 max-w-full">
-              <h3 className="text-lg font-bold mb-4">Kết nối với Canvas khác</h3>
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100] flex items-center justify-center animate-in fade-in duration-200">
+            <div className="bg-surface rounded-xl border border-border-main p-6 w-96 max-w-full shadow-overlay animate-in fade-in zoom-in-95 duration-200">
+              <h3 className="text-lg font-bold mb-4 text-foreground">Kết nối với Canvas khác</h3>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {availableMindmaps.length === 0 ? (
-                  <p className="text-sm text-gray-500">Không có canvas nào khác.</p>
+                  <p className="text-sm text-secondary italic">Không có canvas nào khác.</p>
                 ) : (
                   availableMindmaps.map((m) => (
                     <button
                       key={m.id}
                       onClick={() => handleConnectToMindmap(m)}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-hover-bg transition-colors flex items-center justify-between text-foreground"
                     >
                       <span className="text-sm font-medium">{m.title}</span>
-                      <Plus className="w-4 h-4 text-gray-400" />
+                      <Plus className="w-4 h-4 text-secondary" />
                     </button>
                   ))
                 )}
@@ -1366,7 +1366,7 @@ export default function MindmapBoard({
               <div className="mt-6 flex justify-end">
                 <button
                   onClick={() => setIsConnectModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-secondary hover:text-foreground transition-colors cursor-pointer"
                 >
                   Hủy
                 </button>
@@ -1376,12 +1376,12 @@ export default function MindmapBoard({
         )}
         
         {isAddNoteModalOpen && (
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100] flex items-center justify-center">
-            <div className="bg-white rounded-xl border border-gray-300 p-6 w-96 max-w-full">
-              <h3 className="text-lg font-bold mb-4">Thêm Note vào Canvas</h3>
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100] flex items-center justify-center animate-in fade-in duration-200">
+            <div className="bg-surface rounded-xl border border-border-main p-6 w-96 max-w-full shadow-overlay animate-in fade-in zoom-in-95 duration-200">
+              <h3 className="text-lg font-bold mb-4 text-foreground">Thêm Note vào Canvas</h3>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {existingNotes.length === 0 ? (
-                  <p className="text-sm text-gray-500">Không có note nào.</p>
+                  <p className="text-sm text-secondary italic">Không có note nào.</p>
                 ) : (
                   existingNotes.map((note) => (
                     <button
@@ -1422,10 +1422,10 @@ export default function MindmapBoard({
                         }
                         setIsAddNoteModalOpen(false)
                       }}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-hover-bg transition-colors flex items-center justify-between text-foreground"
                     >
                       <span className="text-sm font-medium">{note.title}</span>
-                      <Plus className="w-4 h-4 text-gray-400" />
+                      <Plus className="w-4 h-4 text-secondary" />
                     </button>
                   ))
                 )}
@@ -1433,7 +1433,7 @@ export default function MindmapBoard({
               <div className="mt-6 flex justify-end">
                 <button
                   onClick={() => setIsAddNoteModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-secondary hover:text-foreground transition-colors cursor-pointer"
                 >
                   Hủy
                 </button>

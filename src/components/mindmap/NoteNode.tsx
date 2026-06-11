@@ -7,6 +7,21 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/local-first/db'
 import { useRouter } from 'next/navigation'
 
+const getDynamicColor = (color: any) => {
+  if (!color) return null
+  const name = color.name
+  if (name === 'Default') return null
+  const lowerName = name?.toLowerCase()
+  if (['red', 'blue', 'green', 'yellow', 'purple'].includes(lowerName)) {
+    return {
+      name: color.name,
+      border: `var(--node-${lowerName}-border)`,
+      bg: `var(--node-${lowerName}-bg)`
+    }
+  }
+  return color
+}
+
 export default function NoteNode({ id, data, selected }: { id: string; data: any; selected: boolean }) {
   const router = useRouter()
   const { setNodes } = useReactFlow()
@@ -19,6 +34,8 @@ export default function NoteNode({ id, data, selected }: { id: string; data: any
 
   const displayTitle = liveNote ? liveNote.title : (data.label || 'Untitled Note')
   const displayContent = liveNote !== undefined ? (liveNote ? liveNote.content : null) : data.content
+
+  const normalizedColor = getDynamicColor(data.color)
 
   const nodeColors = [
     { name: 'Default', border: '#94A3B8', bg: '#ffffff' },
@@ -116,10 +133,10 @@ export default function NoteNode({ id, data, selected }: { id: string; data: any
           !data.color ? 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-850 hover:border-zinc-400 dark:hover:border-zinc-700' : ''
         }`}
         style={{
-          borderColor: data.color 
-            ? (selected ? data.color.border : data.color.border)
+          borderColor: normalizedColor 
+            ? (selected ? normalizedColor.border : normalizedColor.border)
             : (selected ? '#5e6ad2' : undefined),
-          backgroundColor: data.color?.bg
+          backgroundColor: normalizedColor?.bg
         }}
       >
         {/* Header */}
@@ -127,8 +144,8 @@ export default function NoteNode({ id, data, selected }: { id: string; data: any
           className={`flex items-center gap-2 p-3 border-b rounded-t-[14px] ${
             !data.color ? 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50' : ''
           }`}
-          style={data.color ? {
-            borderColor: data.color.border,
+          style={normalizedColor ? {
+            borderColor: normalizedColor.border,
             backgroundColor: 'rgba(0, 0, 0, 0.03)'
           } : undefined}
         >
@@ -150,10 +167,10 @@ export default function NoteNode({ id, data, selected }: { id: string; data: any
         </div>
         
         {/* Handles */}
-        <Handle id="top" type="target" position={Position.Top} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
-        <Handle id="bottom" type="source" position={Position.Bottom} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
-        <Handle id="left" type="target" position={Position.Left} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
-        <Handle id="right" type="source" position={Position.Right} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="top" type="target" position={Position.Top} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: normalizedColor?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="bottom" type="source" position={Position.Bottom} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: normalizedColor?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="left" type="target" position={Position.Left} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: normalizedColor?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="right" type="source" position={Position.Right} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: normalizedColor?.border || '#94A3B8', width: '10px', height: '10px' }} />
       </div>
     </>
   )

@@ -3,6 +3,21 @@ import { Handle, Position, useReactFlow, NodeResizer, NodeToolbar } from '@xyflo
 import { Check, Trash2, Palette, Edit2, Network } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
+const getDynamicColor = (color: any) => {
+  if (!color) return null
+  const name = color.name
+  if (name === 'Default') return null
+  const lowerName = name?.toLowerCase()
+  if (['red', 'blue', 'green', 'yellow', 'purple'].includes(lowerName)) {
+    return {
+      name: color.name,
+      border: `var(--node-${lowerName}-border)`,
+      bg: `var(--node-${lowerName}-bg)`
+    }
+  }
+  return color
+}
+
 export default function TextNode({ id, data, selected }: { id: string; data: any; selected: boolean }) {
   const router = useRouter()
   const { setNodes } = useReactFlow()
@@ -66,6 +81,8 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
   const onBlur = useCallback(() => {
     setIsEditing(false)
   }, [])
+
+  const normalizedColor = getDynamicColor(data.color)
 
   const nodeColors = [
     { name: 'Default', border: '#94A3B8', bg: '#ffffff' },
@@ -165,17 +182,23 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
 
       <div
         onDoubleClick={handleDoubleClick}
-        className={`group relative w-full h-full min-w-[100px] min-h-[48px] flex items-center justify-center rounded-2xl transition-all py-2 px-4 ${selected ? 'border-2 shadow-none' : 'border hover:border-border-strong'}`}
+        className={`group relative w-full h-full min-w-[100px] min-h-[48px] flex items-center justify-center rounded-2xl transition-all py-2 px-4 ${
+          data.color
+            ? (selected ? 'border-2 shadow-none' : 'border hover:border-border-strong')
+            : (selected 
+                ? 'border-2 border-zinc-900 dark:border-zinc-100 bg-white dark:bg-zinc-900 shadow-none' 
+                : 'border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400 dark:hover:border-zinc-700')
+        }`}
         style={{
-          borderColor: selected ? (data.color?.border || '#0f172a') : (data.color?.border || '#cbd5e1'),
-          backgroundColor: data.color?.bg || '#ffffff'
+          borderColor: normalizedColor?.border,
+          backgroundColor: normalizedColor?.bg
         }}
       >
         {/* Handles - Use only source handles with Loose mode to allow dragging from any side */}
-        <Handle id="top" type="source" position={Position.Top} className={`border-2 border-white transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
-        <Handle id="bottom" type="source" position={Position.Bottom} className={`border-2 border-white transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
-        <Handle id="left" type="source" position={Position.Left} className={`border-2 border-white transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
-        <Handle id="right" type="source" position={Position.Right} className={`border-2 border-white transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: data.color?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="top" type="source" position={Position.Top} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: normalizedColor?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="bottom" type="source" position={Position.Bottom} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: normalizedColor?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="left" type="source" position={Position.Left} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: normalizedColor?.border || '#94A3B8', width: '10px', height: '10px' }} />
+        <Handle id="right" type="source" position={Position.Right} className={`border-2 border-white dark:border-zinc-900 transition-all z-50 hover:scale-125 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} style={{ backgroundColor: normalizedColor?.border || '#94A3B8', width: '10px', height: '10px' }} />
 
         <div className="flex items-center gap-2 w-full">
           {data.isLink && <Network className="w-4 h-4 text-primary shrink-0" />}
@@ -183,7 +206,7 @@ export default function TextNode({ id, data, selected }: { id: string; data: any
             ref={textareaRef}
             readOnly={!isEditing || data.isLink}
             aria-label="Nội dung thẻ"
-            className={`w-full resize-none outline-none bg-transparent text-gray-800 text-sm leading-relaxed overflow-hidden ${
+            className={`w-full resize-none outline-none bg-transparent text-zinc-800 dark:text-zinc-100 text-sm leading-relaxed overflow-hidden ${
               isEditing && !data.isLink
                 ? 'cursor-text'
                 : 'cursor-default select-none pointer-events-none'

@@ -47,6 +47,19 @@
   
   /* Biến Bóng đổ chung (Unified Common Shadow) */
   --shadow-linear: 0px 4px 16px rgba(0, 0, 0, 0.04), 0px 1px 2px rgba(0, 0, 0, 0.02);
+
+  /* Sơ đồ tư duy (Mindmap Canvas) - Light Mode */
+  --mindmap-grid-color: #cbd5e1;
+  --node-red-border: #ef4444;
+  --node-red-bg: #fef2f2;
+  --node-blue-border: #3b82f6;
+  --node-blue-bg: #eff6ff;
+  --node-green-border: #22c55e;
+  --node-green-bg: #f0fdf4;
+  --node-yellow-border: #eab308;
+  --node-yellow-bg: #fefce8;
+  --node-purple-border: #a855f7;
+  --node-purple-bg: #faf5ff;
 }
 
 @theme {
@@ -148,6 +161,19 @@
   --active-bg: rgba(255, 255, 255, 0.1);
   --glass-bg: rgba(9, 9, 11, 0.85);
   --glass-border: rgba(255, 255, 255, 0.08);
+
+  /* Sơ đồ tư duy (Mindmap Canvas) - Dark Mode */
+  --mindmap-grid-color: #27272a;
+  --node-red-border: #f87171;
+  --node-red-bg: #450a0a;
+  --node-blue-border: #60a5fa;
+  --node-blue-bg: #172554;
+  --node-green-border: #4ade80;
+  --node-green-bg: #052e16;
+  --node-yellow-border: #facc15;
+  --node-yellow-bg: #422006;
+  --node-purple-border: #c084fc;
+  --node-purple-bg: #3b0764;
 }
 
 html {
