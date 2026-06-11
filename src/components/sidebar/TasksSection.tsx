@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppRouter } from '@/contexts/AppRouterContext';
 import { useClientNavigate } from '@/hooks/useClientNavigate';
 import { usePathname } from 'next/navigation';
-import { Plus, Folder, Layers, Keyboard, Command, X, CheckSquare, Settings, Box, History, ChevronDown } from 'lucide-react';
+import { Plus, Folder, Layers, Keyboard, Command, X, CheckSquare, Settings, Box, History, ChevronDown, LayoutGrid } from 'lucide-react';
 import { useLocalProjects, useLocalCycles, useLocalIssues } from '@/lib/local-first/useLocalTasks';
 import { MockProject, MockCycle, getCycleIcon } from '@/types/models';
 import { runAutoCycleEngine } from '@/lib/local-first/cycle-engine';
@@ -119,11 +119,26 @@ export default function TasksSection() {
     'okrs'
   ].includes(route.type);
 
+  const isWorkspaceActive = isClient && route.type === 'workspace';
+
   return (
     <>
       <div className="flex flex-col gap-2 flex-none shrink-0">
         {/* Main Menu */}
         <div className="space-y-0.5">
+          <div
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/workspace');
+            }}
+            className={`w-full flex items-center justify-between py-1.5 px-2 rounded-md ${SIDEBAR_STYLES.linkText} transition-colors cursor-pointer ${isWorkspaceActive ? SIDEBAR_STYLES.linkActive : SIDEBAR_STYLES.linkInactive}`}
+          >
+            <div className="flex items-center gap-2">
+              <LayoutGrid className="w-3.5 h-3.5 text-zinc-400/80" />
+              <span className={`text-[12px] ${isWorkspaceActive ? 'font-semibold' : 'font-medium'}`}>Workspace</span>
+            </div>
+          </div>
+
           <div
             onClick={(e) => {
               e.preventDefault();
