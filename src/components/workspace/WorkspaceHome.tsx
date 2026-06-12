@@ -336,16 +336,16 @@ export default function WorkspaceHome() {
         </div>
       </header>
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto no-scrollbar">
-        <div className="w-full p-[15px] flex flex-col gap-[15px]">
+      {/* Scrollable content on mobile, fixed viewport on desktop */}
+      <div className="flex-1 overflow-y-auto lg:overflow-hidden no-scrollbar">
+        <div className="w-full h-full p-[15px] flex flex-col gap-[15px] lg:min-h-0">
 
 
 
           {/* Row 2: Today's Tasks & Highest Priority Tasks */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[15px]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[15px] shrink-0">
             {/* Panel 1: Today's Tasks */}
-            <div className="bg-surface border border-border-main rounded-xl p-[15px] flex flex-col min-w-0 transition-all duration-200">
+            <div className="bg-surface border border-border-main rounded-xl p-[15px] flex flex-col min-w-0 transition-all duration-200 lg:h-[240px]">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
                 <Calendar className="w-4 h-4 text-blue-500" strokeWidth={2} />
                 <h3 className="text-xs font-semibold text-foreground tracking-tight">Nhiệm vụ hôm nay</h3>
@@ -362,14 +362,14 @@ export default function WorkspaceHome() {
                     <p className="text-[11px] font-medium text-secondary/60">Không có nhiệm vụ nào cần hoàn thành hôm nay</p>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 overflow-y-auto no-scrollbar flex-1">
                     {todayTasks.slice(0, 5).map(issue => (
                       <TaskRow key={issue.id} issue={issue} />
                     ))}
                     {todayTasks.length > 5 && (
                       <button
                         onClick={() => navigate('/tasks')}
-                        className="text-[10px] text-secondary hover:text-primary font-medium pt-1 text-center transition-colors cursor-pointer"
+                        className="text-[10px] text-secondary hover:text-primary font-medium pt-1 text-center transition-colors cursor-pointer shrink-0"
                       >
                         Xem thêm {todayTasks.length - 5} nhiệm vụ khác →
                       </button>
@@ -380,7 +380,7 @@ export default function WorkspaceHome() {
             </div>
 
             {/* Panel 2: Highest Priority Tasks */}
-            <div className="bg-surface border border-border-main rounded-xl p-[15px] flex flex-col min-w-0 transition-all duration-200">
+            <div className="bg-surface border border-border-main rounded-xl p-[15px] flex flex-col min-w-0 transition-all duration-200 lg:h-[240px]">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
                 <Zap className="w-4 h-4 text-amber-500" strokeWidth={2} />
                 <h3 className="text-xs font-semibold text-foreground tracking-tight">Ưu tiên cao nhất</h3>
@@ -397,14 +397,14 @@ export default function WorkspaceHome() {
                     <p className="text-[11px] font-medium text-secondary/60">Không có nhiệm vụ ưu tiên nào</p>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 overflow-y-auto no-scrollbar flex-1">
                     {priorityTasks.slice(0, 5).map(issue => (
                       <TaskRow key={issue.id} issue={issue} />
                     ))}
                     {priorityTasks.length > 5 && (
                       <button
                         onClick={() => navigate('/tasks')}
-                        className="text-[10px] text-secondary hover:text-primary font-medium pt-1 text-center transition-colors cursor-pointer"
+                        className="text-[10px] text-secondary hover:text-primary font-medium pt-1 text-center transition-colors cursor-pointer shrink-0"
                       >
                         Xem tất cả nhiệm vụ →
                       </button>
@@ -418,9 +418,9 @@ export default function WorkspaceHome() {
 
 
           {/* Row 4: Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-[15px]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[15px] lg:flex-1 lg:min-h-0 lg:h-full">
             {/* Mini Graph View (Col-span: 1) */}
-            <div className="p-[15px] bg-surface border border-border-main rounded-default flex flex-col relative overflow-hidden group self-start w-full">
+            <div className="p-[15px] bg-surface border border-border-main rounded-default flex flex-col relative overflow-hidden group w-full lg:h-full lg:min-h-0">
               <div 
                 onClick={() => navigate('/graph')}
                 className="w-full flex items-center justify-between mb-3 pb-2 border-b border-border-main/50 relative z-20 shrink-0 cursor-pointer"
@@ -431,13 +431,13 @@ export default function WorkspaceHome() {
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <div className="w-full aspect-square relative rounded-lg overflow-hidden border border-border-main/30 bg-background/50 isolate cursor-grab active:cursor-grabbing">
+              <div className="w-full aspect-square lg:aspect-auto lg:flex-1 lg:min-h-0 relative rounded-lg overflow-hidden border border-border-main/30 bg-background/50 isolate cursor-grab active:cursor-grabbing">
                 <GraphView nodes={nodes} loading={!liveNodesReady} hideToolbar={true} />
               </div>
             </div>
 
-            {/* Bar Chart Completed Tasks Trend (Col-span: 2) */}
-            <div className="lg:col-span-2 p-[15px] bg-surface border border-border-main rounded-default flex flex-col min-h-[300px]">
+            {/* Bar Chart Completed Tasks Trend (Col-span: 1) */}
+            <div className="p-[15px] bg-surface border border-border-main rounded-default flex flex-col min-h-[300px] lg:min-h-0 lg:h-full">
               <div className="flex items-center justify-between mb-3 pb-2 border-b border-border-main/50 gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-primary" strokeWidth={2} />
