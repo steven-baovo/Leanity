@@ -6,6 +6,17 @@ import { db } from '@/lib/local-first/db'
 import { useClientNavigate } from '@/hooks/useClientNavigate'
 import { TasksContext } from '@/lib/local-first/TasksProvider'
 import { LocalIssue } from '@/lib/local-first/db'
+import { useLocalWorkspace } from '@/lib/local-first/useLocalWorkspace'
+import dynamic from 'next/dynamic'
+
+const GraphView = dynamic(() => import('@/components/workspace/GraphView'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center text-xs text-secondary/50">
+      Đang tải...
+    </div>
+  ),
+})
 import {
   AlertCircle,
   ChevronsUp,
@@ -146,6 +157,7 @@ function TaskRow({ issue }: { issue: LocalIssue }) {
 export default function WorkspaceHome() {
   const { navigate } = useClientNavigate()
   const { issues } = useContext(TasksContext)
+  const { nodes, liveNodesReady } = useLocalWorkspace()
 
   // Query focus sessions from database
   const sessions = useLiveQuery(() => db.focus_sessions.toArray()) || []
@@ -326,14 +338,14 @@ export default function WorkspaceHome() {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto no-scrollbar">
-        <div className="w-full px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-6">
+        <div className="w-full p-[15px] flex flex-col gap-[15px]">
 
 
 
           {/* Row 2: Today's Tasks & Highest Priority Tasks */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[15px]">
             {/* Panel 1: Today's Tasks */}
-            <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 transition-all duration-200">
+            <div className="bg-surface border border-border-main rounded-xl p-[15px] flex flex-col min-w-0 transition-all duration-200">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
                 <Calendar className="w-4 h-4 text-blue-500" strokeWidth={2} />
                 <h3 className="text-xs font-semibold text-foreground tracking-tight">Nhiệm vụ hôm nay</h3>
@@ -368,7 +380,7 @@ export default function WorkspaceHome() {
             </div>
 
             {/* Panel 2: Highest Priority Tasks */}
-            <div className="bg-surface border border-border-main rounded-xl p-4 flex flex-col min-w-0 transition-all duration-200">
+            <div className="bg-surface border border-border-main rounded-xl p-[15px] flex flex-col min-w-0 transition-all duration-200">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50">
                 <Zap className="w-4 h-4 text-amber-500" strokeWidth={2} />
                 <h3 className="text-xs font-semibold text-foreground tracking-tight">Ưu tiên cao nhất</h3>
@@ -406,9 +418,26 @@ export default function WorkspaceHome() {
 
 
           {/* Row 4: Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-[15px]">
+            {/* Mini Graph View (Col-span: 1) */}
+            <div className="p-[15px] bg-surface border border-border-main rounded-default flex flex-col relative overflow-hidden group self-start w-full">
+              <div 
+                onClick={() => navigate('/graph')}
+                className="w-full flex items-center justify-between mb-3 pb-2 border-b border-border-main/50 relative z-20 shrink-0 cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-indigo-500 group-hover:text-primary transition-colors" strokeWidth={2} />
+                  <h3 className="text-xs font-semibold text-foreground tracking-tight group-hover:text-primary transition-colors">Graph View</h3>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+              <div className="w-full aspect-square relative rounded-lg overflow-hidden border border-border-main/30 bg-background/50 isolate cursor-grab active:cursor-grabbing">
+                <GraphView nodes={nodes} loading={!liveNodesReady} hideToolbar={true} />
+              </div>
+            </div>
+
             {/* Bar Chart Completed Tasks Trend (Col-span: 2) */}
-            <div className="lg:col-span-2 p-5 bg-surface border border-border-main rounded-default flex flex-col min-h-[300px]">
+            <div className="lg:col-span-2 p-[15px] bg-surface border border-border-main rounded-default flex flex-col min-h-[300px]">
               <div className="flex items-center justify-between mb-3 pb-2 border-b border-border-main/50 gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-primary" strokeWidth={2} />
@@ -467,54 +496,6 @@ export default function WorkspaceHome() {
                     </div>
                   )
                 })}
-              </div>
-            </div>
-
-            {/* Time Allocation Pie Chart (Col-span: 1) */}
-            <div className="p-5 bg-surface border border-border-main rounded-default flex flex-col items-center justify-between min-h-[300px]">
-              <div className="w-full flex items-center gap-2 mb-3 pb-2 border-b border-border-main/50 self-start">
-                <Activity className="w-4 h-4 text-emerald-500" strokeWidth={2} />
-                <h3 className="text-xs font-semibold text-foreground tracking-tight">Phân bổ hoạt động</h3>
-              </div>
-
-              <div className="relative w-36 h-36 flex items-center justify-center my-2">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" className="text-zinc-100 dark:text-zinc-800" strokeWidth="3" />
-                  {stats.totalFocusMinutes > 0 && (
-                    <circle 
-                      cx="18" 
-                      cy="18" 
-                      r="15.915" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      className="text-primary" 
-                      strokeWidth="3.2" 
-                      strokeDasharray={`${timeAllocation.focusPercent} ${100 - timeAllocation.focusPercent}`} 
-                      strokeDashoffset="0" 
-                    />
-                  )}
-                </svg>
-                <div className="absolute flex flex-col items-center justify-center">
-                  <span className="text-lg font-black text-foreground leading-none">{timeAllocation.focusPercent}%</span>
-                  <span className="text-[9px] text-secondary uppercase font-bold tracking-wider mt-0.5">Tập trung</span>
-                </div>
-              </div>
-
-              <div className="w-full space-y-2 mt-4">
-                <div className="flex items-center justify-between text-[11px]">
-                  <div className="flex items-center gap-1.5 font-medium text-secondary">
-                    <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-                    <span>Tập trung</span>
-                  </div>
-                  <span className="font-bold text-foreground">{timeAllocation.focusPercent}% ({timeAllocation.focus}m)</span>
-                </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <div className="flex items-center gap-1.5 font-medium text-secondary">
-                    <span className="w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                    <span>Nghỉ ngơi</span>
-                  </div>
-                  <span className="font-bold text-foreground">{timeAllocation.breakPercent}% ({timeAllocation.breakTime}m)</span>
-                </div>
               </div>
             </div>
           </div>
