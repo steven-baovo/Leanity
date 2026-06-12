@@ -36,12 +36,13 @@ interface GraphViewProps {
   loading?: boolean
   onConnectNodes?: (sourceId: string, targetId: string) => Promise<void>
   onDisconnectNodes?: (sourceId: string, targetId: string) => Promise<void>
+  hideToolbar?: boolean
 }
 
 // Con trỏ chuột tẩy — SVG inline encode thành data URL
 const ERASER_CURSOR = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Crect x='2' y='11' width='11' height='8' rx='1.5' fill='%23f87171' stroke='%23991b1b' stroke-width='1'/%3E%3Cpath d='M13 11L19 5L16 2L2 11' fill='%23fca5a5' stroke='%23991b1b' stroke-width='1' stroke-linejoin='round'/%3E%3Cline x1='2' y1='19' x2='20' y2='19' stroke='%23991b1b' stroke-width='1.2'/%3E%3C/svg%3E") 2 20, auto`
 
-export default function GraphView({ nodes, loading, onConnectNodes, onDisconnectNodes }: GraphViewProps) {
+export default function GraphView({ nodes, loading, onConnectNodes, onDisconnectNodes, hideToolbar }: GraphViewProps) {
   const { navigate } = useClientNavigate()
   const prevNodesRef = useRef<any[]>([])
   const [hoveredNode, setHoveredNode] = useState<any>(null)
@@ -370,7 +371,8 @@ export default function GraphView({ nodes, loading, onConnectNodes, onDisconnect
       className="w-full h-full bg-background relative"
     >
       {/* ── Toolbar ── */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-10">
+      {!hideToolbar && (
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-10">
         <button
           onClick={() => {
             setConnectToggled(!connectToggled)
@@ -406,6 +408,7 @@ export default function GraphView({ nodes, loading, onConnectNodes, onDisconnect
           <Eraser className="w-5 h-5" />
         </button>
       </div>
+      )}
 
       {/* ── Tooltip: bật Connect mode + hover node → gợi ý kéo ── */}
       {connectActive && hoveredNode && !dragSource && (
