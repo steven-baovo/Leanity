@@ -15,6 +15,7 @@ import GlobalKeyboardListener from "@/components/GlobalKeyboardListener"
 import QuickCreateModal from "@/components/shared/QuickCreateModal"
 import { ShortcutsHelpProvider } from "@/contexts/ShortcutsHelpContext"
 import ShortcutsHelpModal from "@/components/shared/ShortcutsHelpModal"
+import TitleManager from "@/components/TitleManager"
 
 export default function FrontendLayout({
   children,
@@ -71,6 +72,7 @@ export default function FrontendLayout({
           <ShortcutsHelpProvider>
             <WorkspaceProvider>
             {user && <SyncInitializer />}
+            <TitleManager />
             {/* Global shortcuts */}
             <GlobalKeyboardListener />
             <QuickCreateModal />
