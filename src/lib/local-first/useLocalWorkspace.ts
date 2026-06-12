@@ -95,14 +95,29 @@ export function useLocalWorkspace() {
       titleToUse = `${titleToUse} (${counter})`
     }
 
-    // Tự động tạo note cục bộ nếu loại node là 'note' và chưa có note_id
-    if (node.type === 'note' && !noteId) {
+    // Tự động tạo note cục bộ nếu loại node là 'note' hoặc 'table' và chưa có note_id
+    if ((node.type === 'note' || node.type === 'table') && !noteId) {
       noteId = crypto.randomUUID()
+      
+      let defaultContent = null
+      if (node.type === 'table') {
+        defaultContent = {
+          type: "notion-grid",
+          columns: ["Type", "Status", "UID", "Password", "2FA", "Mail"],
+          rows: [
+            ["", "", "", "", "", ""],
+            ["", "", "", "", "", ""],
+            ["", "", "", "", "", ""]
+          ],
+          cellStyles: {}
+        }
+      }
+
       const newNote = {
         id: noteId,
         user_id: node.user_id || '',
         title: titleToUse,
-        content: null,
+        content: defaultContent,
         created_at: now,
         updated_at: now,
         is_synced: 0,

@@ -21,6 +21,7 @@ export function getNodeIconData(type: string, url?: string | null): NodeIconData
   if (type === 'folder') return { icon: Folder, color: 'text-primary/70' }
   if (type === 'note') return { icon: FileText, color: 'text-secondary/70' }
   if (type === 'map') return { icon: Network, color: 'text-primary' }
+  if (type === 'table') return { icon: Table, color: 'text-emerald-500' }
   
   if (!url) return { icon: LinkIcon, color: 'text-secondary/50' }
 
@@ -57,7 +58,7 @@ export interface WorkspaceNode {
   updated_at: string
   user_id: string
   title: string
-  type: 'folder' | 'note' | 'map' | 'link'
+  type: 'folder' | 'note' | 'map' | 'link' | 'table'
   url?: string | null
   parent_id?: string | null
   order: number

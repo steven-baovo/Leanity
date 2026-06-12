@@ -20,6 +20,7 @@ import CycleDetails from '@/components/cycles/CycleDetails'
 
 // Workspace module
 import NoteEditorClient from '@/components/mindnote/NoteEditorClient'
+import TableEditorClient from '@/components/mindnote/TableEditorClient'
 import WorkspaceHome from '@/components/workspace/WorkspaceHome'
 import ConnectNodeModal from '@/components/workspace/ConnectNodeModal'
 import LinkEmbedPreview from '@/components/workspace/LinkEmbedPreview'
@@ -65,6 +66,43 @@ function WorkspaceView({ id, type }: { id: string | null; type: string }) {
     return (
       <div className="w-full h-full relative overflow-hidden no-scrollbar">
         <NoteEditorClient
+          key={id}
+          noteId={id}
+          onOpenConnectModal={() => setIsConnectModalOpen(true)}
+        />
+        <ConnectNodeModal
+          isOpen={isConnectModalOpen}
+          onClose={() => setIsConnectModalOpen(false)}
+          nodes={nodes}
+          onSelect={async (targetId) => {
+            const currentNode = nodes.find(n => n.note_id === id)
+            if (!currentNode) { alert('Không tìm thấy node hiện tại!'); return }
+            const currentConnections = currentNode.connected_node_ids || []
+            if (currentConnections.includes(targetId)) { alert('Node này đã được kết nối!'); return }
+            const updatedConnections = [...currentConnections, targetId]
+            const { error: errorA } = await updateNode(currentNode.id, { connected_node_ids: updatedConnections })
+            if (errorA) { alert(`Lỗi: ${errorA}`); return }
+            const targetNode = nodes.find(n => n.id === targetId)
+            if (targetNode) {
+              const targetConnections = targetNode.connected_node_ids || []
+              if (!targetConnections.includes(currentNode.id)) {
+                await updateNode(targetId, { connected_node_ids: [...targetConnections, currentNode.id] })
+              }
+            }
+            alert('Đã tạo kết nối 2 chiều!')
+            setIsConnectModalOpen(false)
+          }}
+          currentNodeId={nodes.find(n => n.note_id === id)?.id || ''}
+          alreadyConnectedIds={nodes.find(n => n.note_id === id)?.connected_node_ids || []}
+        />
+      </div>
+    )
+  }
+
+  if (type === 'table' && id) {
+    return (
+      <div className="w-full h-full relative overflow-hidden no-scrollbar">
+        <TableEditorClient
           key={id}
           noteId={id}
           onOpenConnectModal={() => setIsConnectModalOpen(true)}
@@ -189,6 +227,7 @@ function RouterContent() {
 
   // Workspace module
   if (type === 'note')    return <WorkspaceView id={id} type="note" />
+  if (type === 'table')   return <WorkspaceView id={id} type="table" />
   if (type === 'canvas')  return <WorkspaceView id={id} type="canvas" />
   if (type === 'link')    return <WorkspaceView id={id} type="link" />
   if (type === 'graph')   return <WorkspaceView id={null} type="graph" />

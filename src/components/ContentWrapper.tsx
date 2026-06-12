@@ -18,7 +18,8 @@ export default function ContentWrapper({ children }: { children: React.ReactNode
                       route.type === 'link' || 
                       route.type === 'canvas' || 
                       route.type === 'graph' || 
-                      route.type === 'pomodoro'
+                      route.type === 'pomodoro' ||
+                      route.type === 'table'
                     )
   
   const isWorkspace = mounted && route.type === 'workspace'

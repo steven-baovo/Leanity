@@ -16,7 +16,8 @@ import {
   GitFork,
   Link as LucideLink,
   Network,
-  Library
+  Library,
+  Table
 } from 'lucide-react'
 import { useLocalWorkspace } from '@/lib/local-first/useLocalWorkspace'
 import { useLocalNotes } from '@/lib/local-first/useLocalNotes'
@@ -189,6 +190,10 @@ export default function WorkspaceSection() {
     ctxSelectNote(noteId)
     navigate(`/note/${noteId}`)
   }
+  const handleSelectTable = (noteId: string) => {
+    ctxSelectNote(noteId)
+    navigate(`/table/${noteId}`)
+  }
   const handleSelectCanvas = (mapId: string) => {
     ctxSelectCanvas(mapId)
     navigate(`/canvas/${mapId}`)
@@ -227,8 +232,13 @@ export default function WorkspaceSection() {
     }
   }
 
-  const handleCreateNodeDirect = async (parentId: string | null, type: 'folder' | 'note' | 'map' | 'link') => {
-    const defaultTitle = type === 'folder' ? 'Untitled Folder' : type === 'note' ? 'Untitled Note' : type === 'map' ? 'Untitled Canvas' : 'Untitled Link'
+  const handleCreateNodeDirect = async (parentId: string | null, type: 'folder' | 'note' | 'map' | 'link' | 'table') => {
+    const defaultTitle = 
+      type === 'folder' ? 'Untitled Folder' : 
+      type === 'note' ? 'Untitled Note' : 
+      type === 'map' ? 'Untitled Canvas' : 
+      type === 'table' ? 'Untitled Table' : 
+      'Untitled Link'
 
     if (type === 'link') {
       setLinkModalData({
@@ -266,6 +276,8 @@ export default function WorkspaceSection() {
 
       if (type === 'note' && data.note_id) {
         handleSelectNote(data.note_id)
+      } else if (type === 'table' && data.note_id) {
+        handleSelectTable(data.note_id)
       } else if (type === 'map' && data.map_id) {
         handleSelectCanvas(data.map_id)
       }
@@ -280,7 +292,7 @@ export default function WorkspaceSection() {
   const checkAndClearSelection = (deletedNodeId: string) => {
     let activeNode = undefined
     if (activeNoteId) {
-      activeNode = nodes.find(n => n.type === 'note' && n.note_id === activeNoteId)
+      activeNode = nodes.find(n => (n.type === 'note' || n.type === 'table') && n.note_id === activeNoteId)
     } else if (activeCanvasId) {
       activeNode = nodes.find(n => n.type === 'map' && n.map_id === activeCanvasId)
     } else if (activeLinkId) {
@@ -428,6 +440,7 @@ export default function WorkspaceSection() {
     setContextMenu,
     toggleNode,
     onSelectNote: handleSelectNote,
+    onSelectTable: handleSelectTable,
     onSelectCanvas: handleSelectCanvas,
     onSelectLink: handleSelectLink,
     draggedNodeId,
@@ -499,6 +512,15 @@ export default function WorkspaceSection() {
                 icon={FilePlus}
               >
                 Tạo Note mới
+              </DropdownItem>
+              <DropdownItem
+                onClick={() => {
+                  setCreateMenuOpen(false)
+                  handleCreateNodeDirect(null, 'table')
+                }}
+                icon={Table}
+              >
+                Tạo Bảng mới
               </DropdownItem>
               <DropdownItem
                 onClick={() => {
@@ -755,6 +777,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
     setContextMenu,
     toggleNode,
     onSelectNote,
+    onSelectTable,
     onSelectCanvas,
     onSelectLink,
     draggedNodeId,
@@ -770,10 +793,11 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
   const { icon: Icon, color } = getNodeIconData(node.type, node.url)
   const isOpen = openNodes.has(node.id)
   const isActive = (node.type === 'note' && node.note_id === activeNoteId) ||
+                   (node.type === 'table' && node.note_id === activeNoteId) ||
                    (node.type === 'map' && node.map_id === activeCanvasId) ||
                    (node.type === 'link' && node.id === activeLinkId)
 
-  const isActiveNote = node.type === 'note' && node.note_id === activeNoteId
+  const isActiveNote = (node.type === 'note' || node.type === 'table') && node.note_id === activeNoteId
   const isDragOver = dragOverNodeId === node.id && draggedNodeId !== node.id
 
   const isDraggingRef = React.useRef(false)
@@ -875,6 +899,8 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
             toggleNode(node.id)
           } else if (node.type === 'note' && node.note_id) {
             onSelectNote(node.note_id)
+          } else if (node.type === 'table' && node.note_id) {
+            onSelectTable(node.note_id)
           } else if (node.type === 'map' && node.map_id) {
             onSelectCanvas(node.map_id)
           } else if (node.type === 'link') {
@@ -929,7 +955,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
               e.currentTarget.disabled = true
               try {
                 await updateNode(node.id, { title })
-                if (node.type === 'note' && node.note_id) {
+                if ((node.type === 'note' || node.type === 'table') && node.note_id) {
                   await updateMindNote(node.note_id, { title })
                 } else if (node.type === 'map' && node.map_id) {
                   await updateMindmap(node.map_id, { title })
@@ -979,6 +1005,7 @@ const RenderNode = React.memo(({ node, level }: { node: TreeNode; level: number 
           {creatingParentId === node.id && (
             <div className="mb-2 px-1 flex items-center justify-start gap-1 border-b border-border-main/50 pb-2 text-[10px]">
               <button onClick={() => handleCreateNodeDirect(node.id, 'note')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Note</button>
+              <button onClick={() => handleCreateNodeDirect(node.id, 'table')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Bảng</button>
               <button onClick={() => handleCreateNodeDirect(node.id, 'map')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Canvas</button>
               <button onClick={() => handleCreateNodeDirect(node.id, 'link')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Link</button>
               <button onClick={() => handleCreateNodeDirect(node.id, 'folder')} className="p-1 hover:bg-hover-bg rounded text-secondary hover:text-foreground transition-colors">Folder</button>

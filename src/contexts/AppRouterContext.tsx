@@ -18,6 +18,7 @@ export type RouteType =
   | 'cycle'      // /cycle/[id]  (dự phòng)
   | 'workspace'  // /workspace
   | 'note'       // /note/[id]
+  | 'table'      // /table/[id]
   | 'canvas'     // /canvas/[id]
   | 'link'       // /link/[id]
   | 'graph'      // /graph
@@ -51,6 +52,7 @@ export function parseSlug(slug: string[]): RouteState {
     case 'cycle':       return { type: 'cycle', id: seg1 ?? null }
     case 'workspace':   return { type: 'workspace', id: null }
     case 'note':        return { type: 'note', id: seg1 ?? null }
+    case 'table':       return { type: 'table', id: seg1 ?? null }
     case 'canvas':      return { type: 'canvas', id: seg1 ?? null }
     case 'link':        return { type: 'link', id: seg1 ?? null }
     case 'graph':       return { type: 'graph', id: null }

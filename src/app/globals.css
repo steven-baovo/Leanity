@@ -279,37 +279,84 @@ body {
 }
 
 /* ==========================================================================
-   Tiptap Table Custom Premium Styles (Leanity Design Integration)
+   Tiptap Table Custom Premium Styles (Notion-style Integration)
    ========================================================================== */
+
+.prose .tableWrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-top: 1px solid var(--border-main) !important;
+  border-bottom: 1px solid var(--border-main) !important;
+  background-color: transparent;
+}
 
 .prose table {
   border-collapse: collapse !important;
   table-layout: fixed;
   width: 100%;
-  margin: 24px 0;
-  border: 1px solid var(--border-strong) !important;
+  margin: 0 !important;
+  border: none !important;
 }
 
 .prose table td,
 .prose table th {
-  min-width: 1em;
-  border: 1px solid var(--border-strong) !important;
-  padding: 10px 14px !important;
-  vertical-align: top;
+  min-width: 120px;
+  border-top: none !important;
+  border-bottom: 1px solid var(--border-main) !important;
+  border-left: none !important;
+  border-right: 1px solid var(--border-main) !important; /* Đường kẻ dọc mảnh */
+  padding: 10px 12px !important;
+  vertical-align: middle !important;
   box-sizing: border-box;
   position: relative;
-  font-size: 13px;
+  font-size: 13.5px !important;
+  color: var(--foreground);
 }
 
+/* Ô ngoài cùng bên phải không có đường kẻ dọc */
+.prose table td:last-child,
+.prose table th:last-child {
+  border-right: none !important;
+}
+
+/* Triệt tiêu khoảng trống thừa của paragraph bên trong ô */
+.prose table td p,
+.prose table th p {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.5 !important;
+}
+
+/* Tiêu đề cột chuẩn Notion */
 .prose table th {
-  font-weight: 600;
+  font-weight: 500 !important;
   text-align: left;
-  background-color: var(--hover-bg);
-  border-bottom: 2px solid var(--border-strong);
+  background-color: transparent !important; /* Nền trong suốt chuẩn Notion */
+  color: var(--secondary) !important;
+  font-size: 12.5px !important;
+  height: 38px;
+  border-top: none !important;
+  border-bottom: 1px solid var(--border-strong) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
 }
 
+/* Đường viền focus ô đang sửa (Chuẩn Notion Active Cell) */
+.prose table td:focus-within {
+  outline: 1px solid var(--primary) !important;
+  outline-offset: -1px;
+  z-index: 10;
+  background-color: var(--hover-bg) !important;
+}
+
+/* Hover dòng mượt mà */
+.prose table tr:hover td:not([style*="background-color"]) {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Ô được chọn */
 .prose table .selectedCell:after {
-  background: rgba(94, 106, 210, 0.08); /* Primary brand color overlay */
+  background: rgba(94, 106, 210, 0.05) !important;
   content: "";
   left: 0;
   right: 0;
@@ -320,18 +367,21 @@ body {
   z-index: 2;
 }
 
+/* Resize cột */
 .prose table .column-resize-handle {
-  background-color: var(--primary);
-  bottom: -2px;
+  background-color: var(--primary) !important;
+  bottom: 0;
   position: absolute;
   right: -2px;
   pointer-events: none;
   top: 0;
-  width: 4px;
+  width: 3px;
   z-index: 20;
 }
 
-.prose .tableWrapper {
-  overflow-x: auto;
-  margin: 24px 0;
+/* Custom TableEditor cell contentEditable optimization */
+.prose table td div[contenteditable] {
+  outline: none !important;
+  min-height: 22px;
+  width: 100%;
 }

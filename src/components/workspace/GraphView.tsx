@@ -199,7 +199,7 @@ export default function GraphView({ nodes, loading, onConnectNodes, onDisconnect
   // ─── Graph data ────────────────────────────────────────────────────────────
   const { graphData } = useMemo(() => {
     const filteredNodes = nodes.filter(n =>
-      n.type === 'note' || n.type === 'map' || n.type === 'link' || n.type === 'folder'
+      n.type === 'note' || n.type === 'map' || n.type === 'link' || n.type === 'folder' || n.type === 'table'
     )
 
     const gNodes = filteredNodes.map(n => {
@@ -684,6 +684,7 @@ export default function GraphView({ nodes, loading, onConnectNodes, onDisconnect
             if (node.type === 'note' && node.note_id) navigate(`/note/${node.note_id}`)
             else if (node.type === 'map' && node.map_id) navigate(`/canvas/${node.map_id}`)
             else if (node.type === 'link') navigate(`/link/${node.id}`)
+            else if (node.type === 'table' && node.note_id) navigate(`/table/${node.note_id}`)
           }}
 
           warmupTicks={150}
