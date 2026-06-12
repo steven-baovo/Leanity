@@ -19,6 +19,7 @@ export type SectionId =
   | 'phuong-phap-tap-trung-sau-pomodoro' 
   | 'bang-tra-cuu-phim-tat-nhanh' 
   | 'bi-mat-kich-hoat-trang-thai-dong-chay-flow-state'
+  | 'he-thong-node-va-graph-view'
 
 export interface DocSubheading {
   id: string
@@ -366,6 +367,69 @@ export const articles: DocArticle[] = [
           <p className="text-[13px] font-normal">
             Mỗi khi bạn chuyển tab sang mạng xã hội hoặc trả lời một email không liên quan, não bộ của bạn phải chịu ma sát chuyển đổi ngữ cảnh. Nghiên cứu khoa học chỉ ra phải mất trung bình <strong>23 phút 15 giây</strong> để bộ não quay lại trạng thái tập trung sâu ban đầu. Việc hợp nhất Tasks, Library và Pomodoro trong không gian Leanity sinh ra để triệt tiêu triệt để sự rò rỉ nhận thức này.
           </p>
+        </section>
+      </div>
+    )
+  },
+  {
+    id: 'he-thong-node-va-graph-view',
+    category: 'features',
+    categoryLabel: 'Tính năng chi tiết',
+    title: 'Hệ thống Node & Graph View',
+    icon: Compass,
+    description: 'Tìm hiểu kiến trúc liên kết phi tuyến tính dựa trên các Node và cách tương tác trực quan qua Graph View trong Leanity.',
+    subheadings: [
+      { id: 'khai-niem-node', title: '1. Khái niệm Node trong Leanity' },
+      { id: 'lien-ket-cac-node', title: '2. Cách thức liên kết các Node' },
+      { id: 'su-dung-graph-view', title: '3. Hướng dẫn sử dụng Graph View' }
+    ],
+    content: (
+      <div className="space-y-6 text-[13px] text-zinc-600 leading-relaxed font-normal">
+        <section id="khai-niem-node" className="scroll-mt-20 space-y-3 font-normal">
+          <h3 className="text-base font-bold text-zinc-950">1. Khái niệm Node trong Leanity</h3>
+          <p className="text-[13px] font-normal">
+            Trong Leanity, triết lý thiết kế hướng tới việc tổ chức thông tin phi tuyến tính và thống nhất. Do đó, <strong>tất cả các phần tử trong thư viện (library) của bạn đều là các Node</strong>. Bất kể đó là gì, chúng đều có chung một cấu trúc cơ bản và khả năng liên kết chéo mạnh mẽ:
+          </p>
+          <ul className="list-disc pl-5 space-y-2 text-zinc-600 text-[13px] font-normal">
+            <li className="text-[13px] font-normal"><strong>Folder (Thư mục):</strong> Node đóng vai trò là container cha dùng để sắp xếp phân cấp cây thư mục.</li>
+            <li className="text-[13px] font-normal"><strong>Note (Ghi chú):</strong> Node chứa văn bản, ghi chép và các đoạn tài liệu chi tiết.</li>
+            <li className="text-[13px] font-normal"><strong>Canvas (Bản đồ/Mindmap):</strong> Node dạng sơ đồ bảng tự do nơi bạn kết nối trực quan các ý tưởng.</li>
+            <li className="text-[13px] font-normal"><strong>Link (Liên kết):</strong> Node lưu trữ các liên kết web ngoại vi hoặc bookmark tham chiếu nhanh.</li>
+          </ul>
+        </section>
+
+        <section id="lien-ket-cac-node" className="scroll-mt-20 space-y-3 pt-4 font-normal">
+          <h3 className="text-base font-bold text-zinc-950">2. Cách thức liên kết các Node</h3>
+          <p className="text-[13px] font-normal">
+            Để tạo dựng bộ não thứ hai liên kết chặt chẽ, bạn có thể thực hiện liên kết giữa các Node thông qua các cách sau:
+          </p>
+          <ul className="list-disc pl-5 space-y-2 text-zinc-600 text-[13px] font-normal">
+            <li className="text-[13px] font-normal">
+              <strong>Add link trong Editor:</strong> Khi đang soạn thảo ghi chú, hãy bôi đen văn bản hoặc click chuột phải chọn <strong>Add link</strong>, hoặc gõ nhanh ký tự <code>[[</code> để tìm kiếm và chèn nhanh liên kết tới một node khác.
+            </li>
+            <li className="text-[13px] font-normal">
+              <strong>Nút bấm kết nối:</strong> Bấm vào nút liên kết trực tiếp trên giao diện Workspace hoặc Sidebar để gán các Node liên quan với nhau.
+            </li>
+          </ul>
+        </section>
+
+        <section id="su-dung-graph-view" className="scroll-mt-20 space-y-3 pt-4 font-normal">
+          <h3 className="text-base font-bold text-zinc-950">3. Hướng dẫn sử dụng Graph View</h3>
+          <p className="text-[13px] font-normal">
+            <strong>Graph View</strong> là bản đồ 2D tương tác trực quan hiển thị toàn bộ mối quan hệ chéo giữa các Node của bạn. Đây là nơi bạn nhìn thấy tri thức của mình phát triển và liên kết theo cách tự nhiên nhất:
+          </p>
+          <div className="p-4 bg-[#5e6ad2]/5 border border-[#5e6ad2]/10 rounded flex items-start space-x-3 font-normal">
+            <span className="text-[13px] text-[#5e6ad2] select-none font-normal">✨</span>
+            <div className="text-zinc-600 text-[13px] font-normal space-y-2">
+              <p className="font-bold">Các tương tác chính trên Graph View:</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li><strong>Truy cập nhanh (Double Click):</strong> Nhấp đúp chuột vào bất kỳ Node nào trên sơ đồ để chuyển hướng truy cập trực tiếp vào chi tiết của Node đó. Việc dùng click đúp giúp bạn không bị chuyển trang đột ngột khi chỉ muốn nhấp chọn hoặc kéo sắp xếp node.</li>
+                <li><strong>Kết nối siêu tốc (Shift + Drag):</strong> Giữ phím <code>Shift</code> và kéo chuột từ Node này thả vào Node kia để kết nối chúng ngay lập tức ngay trên sơ đồ mà không cần thông qua menu chỉnh sửa.</li>
+                <li><strong>Chế độ Kết nối (Connect Mode):</strong> Bạn cũng có thể click vào nút <em>"Kết nối node"</em> ở góc trên bên phải sơ đồ để bật chế độ kết nối và thực hiện kéo thả liên kết mà không cần giữ phím Shift.</li>
+                <li><strong>Zoom & Pan:</strong> Dùng con lăn chuột để thu phóng sơ đồ. Khi thu nhỏ ở khoảng cách xa, nhãn tên của node sẽ ẩn đi để tránh rối mắt, và tự động hiện lại khi bạn phóng to đến gần.</li>
+              </ul>
+            </div>
+          </div>
         </section>
       </div>
     )

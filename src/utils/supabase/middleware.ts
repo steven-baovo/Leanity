@@ -6,6 +6,18 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  if (process.env.NEXT_PUBLIC_MOCK_AUTH === 'true') {
+    const hasSession = request.cookies.get('sb-mock-session')?.value === 'true'
+    const user = hasSession ? {
+      id: '123e4567-e89b-12d3-a456-426614174000',
+      email: 'local-user@leanity.dev',
+      user_metadata: {
+        full_name: 'Local User'
+      }
+    } : null
+    return { response: supabaseResponse, user }
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -32,3 +44,4 @@ export async function updateSession(request: NextRequest) {
 
   return { response: supabaseResponse, user }
 }
+

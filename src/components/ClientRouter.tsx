@@ -127,7 +127,41 @@ function WorkspaceView({ id, type }: { id: string | null; type: string }) {
           </div>
         </header>
         <div className="flex-1 min-h-0 relative">
-          <GraphView nodes={nodes} loading={!liveNodesReady} />
+          <GraphView
+            nodes={nodes}
+            loading={!liveNodesReady}
+            onConnectNodes={async (sourceId, targetId) => {
+              const sourceNode = nodes.find(n => n.id === sourceId)
+              const targetNode = nodes.find(n => n.id === targetId)
+              if (!sourceNode || !targetNode) return
+
+              const sourceConnections = sourceNode.connected_node_ids || []
+              const targetConnections = targetNode.connected_node_ids || []
+
+              // Tránh tạo liên kết trùng lặp
+              if (!sourceConnections.includes(targetId)) {
+                await updateNode(sourceId, { connected_node_ids: [...sourceConnections, targetId] })
+              }
+              if (!targetConnections.includes(sourceId)) {
+                await updateNode(targetId, { connected_node_ids: [...targetConnections, sourceId] })
+              }
+            }}
+            onDisconnectNodes={async (sourceId, targetId) => {
+              const sourceNode = nodes.find(n => n.id === sourceId)
+              const targetNode = nodes.find(n => n.id === targetId)
+              // Xoá 2 chiều — nhất quán với handleRemoveLink trong Note/Canvas
+              if (sourceNode?.connected_node_ids) {
+                await updateNode(sourceId, {
+                  connected_node_ids: sourceNode.connected_node_ids.filter(id => id !== targetId)
+                })
+              }
+              if (targetNode?.connected_node_ids) {
+                await updateNode(targetId, {
+                  connected_node_ids: targetNode.connected_node_ids.filter(id => id !== sourceId)
+                })
+              }
+            }}
+          />
         </div>
       </div>
     )

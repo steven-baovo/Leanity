@@ -329,9 +329,16 @@ export default function MindmapBoard({
 
   const handleRemoveLink = useCallback(async (targetNodeId: string) => {
     if (!currentCanvasNode) return
+    // Xoá phía source
     const updatedLinks = linkedNodeIds.filter(id => id !== targetNodeId)
     await updateNode(currentCanvasNode.id, { connected_node_ids: updatedLinks })
-  }, [currentCanvasNode, linkedNodeIds, updateNode])
+    // Xoá phía target (bidirectional) — đảm bảo graph view không hiện link ở chiều ngược
+    const targetNode = allWorkspaceNodes.find(n => n.id === targetNodeId)
+    if (targetNode && Array.isArray(targetNode.connected_node_ids)) {
+      const reverseUpdated = targetNode.connected_node_ids.filter(id => id !== currentCanvasNode.id)
+      await updateNode(targetNodeId, { connected_node_ids: reverseUpdated })
+    }
+  }, [currentCanvasNode, linkedNodeIds, updateNode, allWorkspaceNodes])
 
   const handleSaveTitle = useCallback(async () => {
     setIsEditingTitle(false)

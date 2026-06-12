@@ -169,8 +169,15 @@ const NoteEditorClient = ({ noteId, onOpenConnectModal }: NoteEditorClientProps)
 
   const handleRemoveLink = async (targetId: string) => {
     if (!currentNode) return
+    // Xoá phía source
     const updatedLinks = linkedNodeIds.filter(id => id !== targetId)
     await updateNode(currentNode.id, { connected_node_ids: updatedLinks })
+    // Xoá phía target (bidirectional) — đảm bảo graph view không hiện link ở chỉều ngược
+    const targetNode = allNodes?.find(n => n.id === targetId)
+    if (targetNode && Array.isArray(targetNode.connected_node_ids)) {
+      const reverseUpdated = targetNode.connected_node_ids.filter(id => id !== currentNode.id)
+      await updateNode(targetId, { connected_node_ids: reverseUpdated })
+    }
   }
 
   // Loading state — chỉ hiện spinner nhỏ khi lần đầu load noteId mới
